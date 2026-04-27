@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Tozalash Servis</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #2196F3;
+            --primary-dark: #1565C0;
+            --secondary: #00BCD4;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #F44336;
+            --bg: #F5F7FA;
+            --card: #FFFFFF;
+            --text: #1A1A2E;
+            --text-light: #6B7280;
+            --border: #E5E7EB;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --radius: 16px;
+            --radius-sm: 10px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 90px;
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #1565C0 0%, #0D47A1 50%, #00BCD4 100%);
+            padding: 50px 20px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .header-logo {
+            width: 70px;
+            height: 70px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.85);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            background: white;
+            padding: 8px;
+            margin: 16px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            gap: 4px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px 6px;
+            text-align: center;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 12px rgba(33,150,243,0.4);
+        }
+
+        .tab-icon {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* SECTIONS */
+        .section {
+            display: none;
+            padding: 0 16px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* SERVICE GRID */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .service-card:active {
+            transform: scale(0.96);
+        }
+
+        .service-card.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #E3F2FD, #F3E5F5);
+        }
+
+        .service-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .service-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .service-price {
+            font-size: 11px;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* CALCULATOR */
+        .calc-display {
+            background: linear-gradient(135deg, #1565C0, #0D47A1);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 12px;
+            color: white;
+            text-align: center;
+        }
+
+        .calc-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+
+        .calc-amount {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .calc-amount span {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* SLIDER */
+        .slider-container {
+            margin: 12px 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, var(--primary) 0%, var(--border) 0%);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(33,150,243,0.4);
+            border: 3px solid white;
+        }
+
+        /* BADGE */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-blue { background: #E3F2FD; color: var(--primary); }
+        .badge-green { background: #E8F5E9; color: var(--success); }
+        .badge-orange { background: #FFF3E0; color: var(--warning); }
+        .badge-red { background: #FFEBEE; color: var(--danger); }
+        .badge-purple { background: #F3E5F5; color: #9C27B0; }
+
+        /* INFO ROW */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .info-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* PROGRESS BAR */
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        /* STAT GRID */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--radius-sm);
+            padding: 14px 8px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .stat-icon { font-size: 20px; margin-bottom: 4px; }
+        .stat-value { font-size: 18px; font-weight: 700; color: var(--text); }
+        .stat-label { font-size: 10px; color: var(--text-light); }
+
+        /* ORDER LIST */
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .order-item:last-child { border-bottom: none; }
+
+        .order-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .order-info { flex: 1; }
+        .order-name { font-size: 13px; font-weight: 600; }
+        .order-date { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+        .order-price { font-size: 13px; font-weight: 700; color: var(--primary); }
+
+        /* PRICE LIST */
+        .price-category {
+            margin-bottom: 4px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, #E3F2FD, #EDE7F6);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            margin-bottom: 2px;
+            background: white;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+        }
+
+        .price-item:last-child { margin-bottom: 12px; }
+        .price-item-name { color: var(--text); }
+        .price-item-value { font-weight: 700; color: var(--primary); }
+
+        /* DISCOUNT TAGS */
+        .discount-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .discount-card {
+            background: white;
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .discount-icon { font-size: 22px; margin-bottom: 6px; }
+        .discount-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .discount-value { font-size: 18px; font-weight: 800; color: var(--success); }
+        .discount-desc { font-size: 10px; color: var(--text-light); margin-top: 2px; }
+
+        /* BOTTOM NAV */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 8px 16px 20px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .order-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: var(--radius);
+            width: 100%;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(33,150,243,0.4);
+            letter-spacing: 0.5px;
+        }
+
+        .order-btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(33,150,243,0.4);
+        }
+
+        /* HERO BANNER */
+        .hero-banner {
+            background: linear-gradient(135deg, #1565C0, #00BCD4);
+            border-radius: var(--radius);
+            padding: 20px;
+            color: white;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::after {
+            content: '🧹';
+            position: absolute;
+            right: 10px;
+            bottom: -5px;
+            font-size: 60px;
+            opacity: 0.3;
+        }
+
+        .hero-banner h2 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .hero-banner p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            margin-top: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* FEATURE LIST */
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .feature-item:last-child { border-bottom: none; }
+        .feature-icon { font-size: 20px; width: 30px; text-align: center; }
+
+        /* REFERRAL */
+        .ref-code-box {
+            background: linear-gradient(135deg, #E3F2FD, #EDE7F6);
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: center;
+            margin: 12px 0;
+        }
+
+        .ref-code {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: var(--primary);
+        }
+
+        .ref-label {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1A1A2E;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* CONTACT */
+        .contact-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            background: white;
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .contact-card:active { transform: scale(0.98); }
+
+        .contact-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .contact-info {}
+        .contact-name { font-size: 14px; font-weight: 600; }
+        .contact-value { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+
+        /* LOADING */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-icon { font-size: 50px; margin-bottom: 12px; }
+        .empty-title { font-size: 16px; font-weight: 600; color: var(--text); }
+        .empty-desc { font-size: 13px; margin-top: 6px; }
+    </style>
+</head>
+<body>
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-logo">🧹</div>
+        <h1>Tozalash Servis</h1>
+        <p>Professional tozalash xizmati</p>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('home')">
+            <span class="tab-icon">🏠</span>Asosiy
+        </div>
+        <div class="tab" onclick="switchTab('calc')">
+            <span class="tab-icon">🧮</span>Hisob
+        </div>
+        <div class="tab" onclick="switchTab('orders')">
+            <span class="tab-icon">📋</span>Tarix
+        </div>
+        <div class="tab" onclick="switchTab('prices')">
+            <span class="tab-icon">💰</span>Narxlar
+        </div>
+        <div class="tab" onclick="switchTab('me')">
+            <span class="tab-icon">👤</span>Men
+        </div>
+    </div>
+
+    <!-- HOME -->
+    <div class="section active" id="tab-home">
+        <!-- Hero Banner -->
+        <div class="hero-banner">
+            <h2>Xush kelibsiz! 👋</h2>
+            <p>Toshkent bo'ylab professional tozalash. Karcher apparatlari va sifatli vositalar.</p>
+            <span class="hero-tag">⚡ Tez buyurtma</span>
+        </div>
+
+        <!-- Stats -->
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-icon">👷</div>
+                <div class="stat-value">10</div>
+                <div class="stat-label">Max ishchi</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-value">4.9</div>
+                <div class="stat-label">Reyting</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value">1000+</div>
+                <div class="stat-label">Buyurtma</div>
+            </div>
+        </div>
+
+        <!-- Services -->
+        <div class="card">
+            <div class="card-title">🛠 Xizmatlar</div>
+            <div class="service-grid">
+                <div class="service-card" onclick="selectService('cleaning')" id="s-cleaning">
+                    <div class="service-icon">🧹</div>
+                    <div class="service-name">Uy tozalash</div>
+                    <div class="service-price">500,000/ishchi</div>
+                </div>
+                <div class="service-card" onclick="selectService('sofa')" id="s-sofa">
+                    <div class="service-icon">🛋</div>
+                    <div class="service-name">Divan yuvish</div>
+                    <div class="service-price">80,000/o'rin</div>
+                </div>
+                <div class="service-card" onclick="selectService('carpet')" id="s-carpet">
+                    <div class="service-icon">🟫</div>
+                    <div class="service-name">Gilam yuvish</div>
+                    <div class="service-price">27,000/kv.m</div>
+                </div>
+                <div class="service-card" onclick="selectService('facade')" id="s-facade">
+                    <div class="service-icon">🏢</div>
+                    <div class="service-name">Fasad yuvish</div>
+                    <div class="service-price">22,000/kv.m</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="card">
+            <div class="card-title">✨ Afzalliklarimiz</div>
+            <div class="feature-item">
+                <div class="feature-icon">⚡</div>
+                <div>Professional Karcher apparatlari</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🧴</div>
+                <div>Barcha vositalar bizdan</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🚗</div>
+                <div>Borish narxga kiritilgan</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🛡</div>
+                <div>48 soat kafolat</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">⏰</div>
+                <div>Har kuni 09:00 - 17:00</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CALCULATOR -->
+    <div class="section" id="tab-calc">
+        <div class="calc-display">
+            <div class="calc-label">Taxminiy narx</div>
+            <div class="calc-amount" id="calc-result">500,000 <span>so'm</span></div>
+            <div class="calc-label" id="calc-detail" style="margin-top:8px">1 ishchi · 1 kun</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📌 Xizmat turi</div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="badge badge-blue calc-type-btn active" onclick="setCalcType('cleaning', this)">🧹 Tozalash</button>
+                <button class="badge badge-blue calc-type-btn" onclick="setCalcType('sofa', this)">🛋 Divan</button>
+                <button class="badge badge-blue calc-type-btn" onclick="setCalcType('carpet', this)">🟫 Gilam</button>
+                <button class="badge badge-blue calc-type-btn" onclick="setCalcType('facade', this)">🏢 Fasad</button>
+                <button class="badge badge-blue calc-type-btn" onclick="setCalcType('chair', this)">💺 Stul</button>
+                <button class="badge badge-blue calc-type-btn" onclick="setCalcType('tile', this)">🧱 Plitka</button>
+            </div>
+        </div>
+
+        <div class="card" id="calc-workers-block">
+            <div class="card-title">👷 Ishchilar soni</div>
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>1 ishchi</span>
+                    <span id="workers-value">1 ishchi</span>
+                    <span>10 ishchi</span>
+                </div>
+                <input type="range" class="slider" id="workers-slider"
+                    min="1" max="10" value="1" oninput="updateCalc()">
+            </div>
+        </div>
+
+        <div class="card" id="calc-qty-block" style="display:none">
+            <div class="card-title" id="calc-qty-label">Miqdor</div>
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span id="calc-min">5</span>
+                    <span id="calc-qty-value">5</span>
+                    <span id="calc-max">50</span>
+                </div>
+                <input type="range" class="slider" id="qty-slider"
+                    min="5" max="50" value="5" oninput="updateCalcQty()">
+            </div>
+        </div>
+
+        <div class="card" id="discount-info">
+            <div class="card-title">🎁 Chegirmalar</div>
+            <div class="discount-grid">
+                <div class="discount-card">
+                    <div class="discount-icon">🎉</div>
+                    <div class="discount-title">Birinchi</div>
+                    <div class="discount-value">-5%</div>
+                    <div class="discount-desc">Birinchi buyurtma</div>
+                </div>
+                <div class="discount-card">
+                    <div class="discount-icon">⚡</div>
+                    <div class="discount-title">Shoshilinch</div>
+                    <div class="discount-value">+25%</div>
+                    <div class="discount-desc">24 soatdan kam</div>
+                </div>
+                <div class="discount-card">
+                    <div class="discount-icon">🌟</div>
+                    <div class="discount-title">VIP</div>
+                    <div class="discount-value">-8%</div>
+                    <div class="discount-desc">20+ buyurtma</div>
+                </div>
+                <div class="discount-card">
+                    <div class="discount-icon">🏆</div>
+                    <div class="discount-title">Sodiq</div>
+                    <div class="discount-value">-10%</div>
+                    <div class="discount-desc">10+ buyurtma</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="section" id="tab-orders">
+        <div id="orders-loading" class="loading">
+            <div class="spinner"></div>
+            <p>Yuklanmoqda...</p>
+        </div>
+        <div id="orders-list" style="display:none">
+            <!-- JS tomonidan to'ldiriladi -->
+        </div>
+        <div id="orders-empty" class="empty-state" style="display:none">
+            <div class="empty-icon">📋</div>
+            <div class="empty-title">Buyurtmalar yo'q</div>
+            <div class="empty-desc">Birinchi buyurtmangizni bering!</div>
+        </div>
+    </div>
+
+    <!-- PRICES -->
+    <div class="section" id="tab-prices">
+        <div class="price-category">🏠 Uy/Ofis tozalash</div>
+        <div class="price-item">
+            <span class="price-item-name">🧹 Oddiy tozalash</span>
+            <span class="price-item-value">500,000/ishchi</span>
+        </div>
+        <div class="price-item">
+            <span class="price-item-name">🧼 General tozalash</span>
+            <span class="price-item-value">500,000/ishchi</span>
+        </div>
+        <div class="price-item">
+            <span class="price-item-name">🔨 Remont keyin</span>
+            <span class="price-item-value">600,000/ishchi</span>
+        </div>
+
+        <div class="price-category">🛋 Mebel yuvish</div>
+        <div class="price-item">
+            <span class="price-item-name">🛋 Divan (min 5)</span>
+            <span class="price-item-value">80,000/o'rin</span>
+        </div>
+        <div class="price-item">
+            <span class="price-item-name">💺 Stul (min 5)</span>
+            <span class="price-item-value">50,000/dona</span>
+        </div>
+
+        <div class="price-category">🟫 Gilam va fasad</div>
+        <div class="price-item">
+            <span class="price-item-name">🟫 Gilam (min 10)</span>
+            <span class="price-item-value">27,000/kv.m</span>
+        </div>
+        <div class="price-item">
+            <span class="price-item-name">🏢 Fasad</span>
+            <span class="price-item-value">22,000/kv.m</span>
+        </div>
+        <div class="price-item">
+            <span class="price-item-name">🧱 Plitka</span>
+            <span class="price-item-value">15,000/kv.m</span>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+            <div class="card-title">ℹ️ Qo'shimcha ma'lumot</div>
+            <div class="feature-item">
+                <div class="feature-icon">🚗</div>
+                <div>Borish narxga kiritilgan</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">📦</div>
+                <div>Barcha vositalar bizdan</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">⏰</div>
+                <div>Ish vaqti: 09:00 - 17:00</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">👷</div>
+                <div>Maksimal 10 ta ishchi</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ME -->
+    <div class="section" id="tab-me">
+        <!-- User info -->
+        <div class="card" id="user-card">
+            <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px">
+                <div style="width:54px;height:54px;background:linear-gradient(135deg,#1565C0,#00BCD4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:white;flex-shrink:0">
+                    👤
+                </div>
+                <div>
+                    <div style="font-size:16px;font-weight:700" id="user-name">Foydalanuvchi</div>
+                    <div style="font-size:12px;color:var(--text-light)" id="user-level">🥉 Bronze</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="level-progress" style="width:0%"></div>
+            </div>
+            <div style="font-size:11px;color:var(--text-light);text-align:right;margin-top:4px" id="level-text">0/500 ball</div>
+
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px">
+                <div style="text-align:center;padding:10px;background:var(--bg);border-radius:10px">
+                    <div style="font-size:18px;font-weight:700" id="me-orders">0</div>
+                    <div style="font-size:10px;color:var(--text-light)">Buyurtma</div>
+                </div>
+                <div style="text-align:center;padding:10px;background:var(--bg);border-radius:10px">
+                    <div style="font-size:18px;font-weight:700" id="me-spent">0</div>
+                    <div style="font-size:10px;color:var(--text-light)">Sarflangan</div>
+                </div>
+                <div style="text-align:center;padding:10px;background:var(--bg);border-radius:10px">
+                    <div style="font-size:18px;font-weight:700" id="me-refs">0</div>
+                    <div style="font-size:10px;color:var(--text-light)">Taklif</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Referral -->
+        <div class="card">
+            <div class="card-title">👥 Referral dasturi</div>
+            <div class="ref-code-box">
+                <div class="ref-code" id="ref-code">TS----</div>
+                <div class="ref-label">Do'stingizga yuboring - ikkalangiz 5% chegirma!</div>
+            </div>
+            <button onclick="copyRef()" style="width:100%;padding:12px;background:linear-gradient(135deg,#1565C0,#00BCD4);color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">
+                📋 Kodni nusxalash
+            </button>
+        </div>
+
+        <!-- Contacts -->
+        <div class="card">
+            <div class="card-title">📞 Aloqa</div>
+            <a class="contact-card" href="tel:+998887887011">
+                <div class="contact-icon" style="background:#E8F5E9">📞</div>
+                <div class="contact-info">
+                    <div class="contact-name">Qo'ng'iroq</div>
+                    <div class="contact-value">+998 88 788 7011</div>
+                </div>
+            </a>
+            <a class="contact-card" href="https://t.me/tozalash_servis" target="_blank">
+                <div class="contact-icon" style="background:#E3F2FD">📢</div>
+                <div class="contact-info">
+                    <div class="contact-name">Telegram kanal</div>
+                    <div class="contact-value">@tozalash_servis</div>
+                </div>
+            </a>
+            <a class="contact-card" href="https://www.instagram.com/tozalash.servis" target="_blank">
+                <div class="contact-icon" style="background:#FCE4EC">📸</div>
+                <div class="contact-info">
+                    <div class="contact-name">Instagram</div>
+                    <div class="contact-value">@tozalash.servis</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="bottom-nav">
+        <button class="order-btn" onclick="placeOrder()" id="main-order-btn">
+            📝 Buyurtma berish
+        </button>
+    </div>
+
+    <script>
+        // Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        // Theme colors
+        document.documentElement.style.setProperty(
+            '--bg', tg.colorScheme === 'dark' ? '#1A1A2E' : '#F5F7FA'
+        );
+        document.documentElement.style.setProperty(
+            '--card', tg.colorScheme === 'dark' ? '#16213E' : '#FFFFFF'
+        );
+        document.documentElement.style.setProperty(
+            '--text', tg.colorScheme === 'dark' ? '#E2E8F0' : '#1A1A2E'
+        );
+
+        // User data
+        const user = tg.initDataUnsafe?.user || {};
+        const userData = {
+            name: user.first_name || 'Foydalanuvchi',
+            points: 0,
+            orders: 0,
+            spent: 0,
+            refs: 0,
+            refCode: 'TSXXXXXX',
+        };
+
+        // Calculator state
+        let calcType = 'cleaning';
+        let calcWorkers = 1;
+        let calcQty = 5;
+
+        const prices = {
+            cleaning: 500000,
+            sofa: 80000,
+            carpet: 27000,
+            facade: 22000,
+            chair: 50000,
+            tile: 15000,
+        };
+
+        const units = {
+            cleaning: "ishchi",
+            sofa: "o'rin",
+            carpet: "kv.m",
+            facade: "kv.m",
+            chair: "dona",
+            tile: "kv.m",
+        };
+
+        const mins = { sofa: 5, carpet: 10, facade: 1, chair: 5, tile: 1 };
+
+        // TABS
+        function switchTab(name) {
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                const tabs = ['home', 'calc', 'orders', 'prices', 'me'];
+                t.classList.toggle('active', tabs[i] === name);
+            });
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`tab-${name}`).classList.add('active');
+
+            if (name === 'orders') loadOrders();
+            if (name === 'me') loadUserData();
+
+            // Update order btn
+            const btn = document.getElementById('main-order-btn');
+            if (name === 'calc') {
+                btn.textContent = '🧮 Buyurtma berish';
+            } else if (name === 'me') {
+                btn.textContent = '📞 Qo\'ng\'iroq qilish';
+                btn.onclick = () => window.location.href = 'tel:+998887887011';
+            } else {
+                btn.textContent = '📝 Buyurtma berish';
+                btn.onclick = placeOrder;
+            }
+        }
+
+        // SERVICE SELECT
+        let selectedService = 'cleaning';
+        function selectService(type) {
+            document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById(`s-${type}`).classList.add('selected');
+            selectedService = type;
+            switchTab('calc');
+            setCalcType(type, null);
+        }
+
+        // CALCULATOR
+        function setCalcType(type, btn) {
+            calcType = type;
+            if (btn) {
+                document.querySelectorAll('.calc-type-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+
+            const isWorker = type === 'cleaning';
+            document.getElementById('calc-workers-block').style.display = isWorker ? 'block' : 'none';
+            document.getElementById('calc-qty-block').style.display = isWorker ? 'none' : 'block';
+
+            if (!isWorker) {
+                const min = mins[type] || 1;
+                const max = type === 'carpet' ? 200 : type === 'facade' ? 500 : 50;
+                const slider = document.getElementById('qty-slider');
+                slider.min = min;
+                slider.max = max;
+                slider.value = min;
+                calcQty = min;
+
+                const labels = {
+                    sofa: "o'rin soni",
+                    carpet: "kv.m",
+                    facade: "kv.m",
+                    chair: "stul soni",
+                    tile: "kv.m",
+                };
+                document.getElementById('calc-qty-label').textContent = `📊 ${labels[type] || 'Miqdor'}`;
+                document.getElementById('calc-min').textContent = min;
+                document.getElementById('calc-max').textContent = max;
+            }
+            updateCalc();
+        }
+
+        function updateCalc() {
+            const slider = document.getElementById('workers-slider');
+            calcWorkers = parseInt(slider.value);
+            const fill = ((calcWorkers - 1) / 9) * 100;
+            slider.style.background = `linear-gradient(to right, #2196F3 ${fill}%, #E5E7EB ${fill}%)`;
+            document.getElementById('workers-value').textContent = `${calcWorkers} ishchi`;
+
+            const price = prices[calcType] || 500000;
+            const total = price * calcWorkers;
+            document.getElementById('calc-result').innerHTML =
+                `${formatNum(total)} <span>so'm</span>`;
+            document.getElementById('calc-detail').textContent =
+                `${calcWorkers} ishchi · 1 kun`;
+        }
+
+        function updateCalcQty() {
+            const slider = document.getElementById('qty-slider');
+            calcQty = parseInt(slider.value);
+            const min = parseInt(slider.min);
+            const max = parseInt(slider.max);
+            const fill = ((calcQty - min) / (max - min)) * 100;
+            slider.style.background = `linear-gradient(to right, #2196F3 ${fill}%, #E5E7EB ${fill}%)`;
+            document.getElementById('calc-qty-value').textContent = `${calcQty} ${units[calcType] || ''}`;
+
+            const price = prices[calcType] || 0;
+            const total = price * calcQty;
+            document.getElementById('calc-result').innerHTML =
+                `${formatNum(total)} <span>so'm</span>`;
+            document.getElementById('calc-detail').textContent =
+                `${calcQty} ${units[calcType] || ''} × ${formatNum(price)} so'm`;
+        }
+
+        // FORMAT
+        function formatNum(n) {
+            return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        // ORDERS
+        function loadOrders() {
+            document.getElementById('orders-loading').style.display = 'flex';
+            document.getElementById('orders-list').style.display = 'none';
+            document.getElementById('orders-empty').style.display = 'none';
+
+            // Botdan ma'lumot olish (WebApp sendData orqali)
+            setTimeout(() => {
+                document.getElementById('orders-loading').style.display = 'none';
+                showSampleOrders();
+            }, 1000);
+        }
+
+        function showSampleOrders() {
+            const orders = tg.initDataUnsafe?.start_param ?
+                JSON.parse(atob(tg.initDataUnsafe.start_param) || '[]') : [];
+
+            const list = document.getElementById('orders-list');
+
+            if (!orders || orders.length === 0) {
+                document.getElementById('orders-empty').style.display = 'block';
+                return;
+            }
+
+            const icons = {
+                cleaning_standard: { icon: '🧹', bg: '#E3F2FD' },
+                cleaning_general: { icon: '🧼', bg: '#E8F5E9' },
+                cleaning_renovation: { icon: '🔨', bg: '#FFF3E0' },
+                sofa: { icon: '🛋', bg: '#F3E5F5' },
+                carpet: { icon: '🟫', bg: '#FBE9E7' },
+                facade: { icon: '🏢', bg: '#E0F7FA' },
+            };
+
+            const statusMap = {
+                pending_admin: { text: 'Ko\'rib chiqilmoqda', class: 'badge-orange' },
+                confirmed: { text: 'Tasdiqlangan', class: 'badge-green' },
+                in_progress: { text: 'Bajarilmoqda', class: 'badge-blue' },
+                completed: { text: 'Tugallangan', class: 'badge-green' },
+                cancelled: { text: 'Bekor', class: 'badge-red' },
+            };
+
+            list.innerHTML = '';
+            const card = document.createElement('div');
+            card.className = 'card';
+
+            orders.forEach(o => {
+                const ic = icons[o.order_type] || { icon: '📋', bg: '#F5F5F5' };
+                const st = statusMap[o.status] || { text: o.status, class: 'badge-blue' };
+
+                card.innerHTML += `
+                    <div class="order-item">
+                        <div class="order-icon" style="background:${ic.bg}">${ic.icon}</div>
+                        <div class="order-info">
+                            <div class="order-name">#${o.order_id}</div>
+                            <div class="order-date">${o.scheduled_date || 'N/A'}</div>
+                            <span class="badge ${st.class}" style="margin-top:4px">${st.text}</span>
+                        </div>
+                        <div class="order-price">${formatNum(o.final_price || 0)}</div>
+                    </div>
+                `;
+            });
+
+            list.appendChild(card);
+            list.style.display = 'block';
+        }
+
+        // USER DATA
+        function loadUserData() {
+            const u = tg.initDataUnsafe?.user || {};
+            document.getElementById('user-name').textContent =
+                (u.first_name || '') + ' ' + (u.last_name || '');
+
+            const points = userData.points || 0;
+            const levels = [
+                { name: '🥉 Bronze', min: 0, max: 500 },
+                { name: '🥈 Silver', min: 500, max: 1500 },
+                { name: '🥇 Gold', min: 1500, max: 3000 },
+                { name: '💎 Diamond', min: 3000, max: 5000 },
+                { name: '👑 Legend', min: 5000, max: 99999 },
+            ];
+            const lvl = levels.find(l => points >= l.min && points < l.max) || levels[0];
+            const progress = Math.min(100, ((points - lvl.min) / (lvl.max - lvl.min)) * 100);
+
+            document.getElementById('user-level').textContent = lvl.name;
+            document.getElementById('level-progress').style.width = progress + '%';
+            document.getElementById('level-text').textContent = `${points}/${lvl.max} ball`;
+            document.getElementById('me-orders').textContent = userData.orders;
+            document.getElementById('me-spent').textContent = formatNum(userData.spent);
+            document.getElementById('me-refs').textContent = userData.refs;
+            document.getElementById('ref-code').textContent = userData.refCode;
+        }
+
+        // COPY REF
+        function copyRef() {
+            const code = document.getElementById('ref-code').textContent;
+            const text = `https://t.me/${window.botUsername || 'tozalash_servisbot'}?start=ref_${code}`;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text);
+            }
+            showToast('📋 Nusxalandi!');
+        }
+
+        // ORDER
+        function placeOrder() {
+            const service = selectedService || calcType;
+            tg.sendData(JSON.stringify({
+                action: 'order',
+                service: service,
+                workers: calcWorkers,
+                qty: calcQty,
+            }));
+        }
+
+        // TOAST
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        // INIT
+        loadUserData();
+        updateCalc();
+
+        // Main button
+        tg.MainButton.setText('📝 Buyurtma berish');
+        tg.MainButton.show();
+        tg.MainButton.onClick(placeOrder);
+    </script>
+</body>
+</html>
