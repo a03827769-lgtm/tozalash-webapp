@@ -3,201 +3,282 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#0A1628">
+<meta name="theme-color" content="#0F172A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Tozalash Servis</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<!-- Toast -->
 <div class="toast" id="toast"></div>
-<div class="mbg" id="mbg"><div class="mdl" id="mdl"></div></div>
 
-<!-- HEADER -->
+<!-- Modal -->
+<div class="modal-overlay" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<!-- ═══ HEADER ═══ -->
 <div class="hdr">
-  <div class="hdr-glow1"></div><div class="hdr-glow2"></div>
-  <div class="hdr-bottom"></div>
-  <div class="hdr-theme" onclick="toggleTheme()">🌙</div>
-  <div class="hdr-notif" onclick="showSettings()">⚙️</div>
-  <div class="hdr-content">
+  <div class="hdr-glow hdr-glow-1"></div>
+  <div class="hdr-glow hdr-glow-2"></div>
+  <div class="hdr-curve"></div>
+  <div class="hdr-btn hdr-btn-left" onclick="toggleDark()" id="themeBtn">🌙</div>
+  <div class="hdr-btn hdr-btn-right" onclick="openSettings()">⚙️</div>
+  <div class="hdr-inner">
     <div class="hdr-logo">🧹</div>
     <h1>TOZALASH SERVIS</h1>
-    <div class="hdr-sub">PROFESSIONAL CLEANING • TOSHKENT</div>
-    <div class="hdr-badges">
-      <div class="hdr-badge">⭐ 4.9 reyting</div>
-      <div class="hdr-badge">✅ 1000+ buyurtma</div>
-      <div class="hdr-badge">🛡 48s kafolat</div>
+    <div class="hdr-sub">Professional Cleaning • Toshkent</div>
+    <div class="hdr-pills">
+      <span class="hdr-pill">⭐ 4.9</span>
+      <span class="hdr-pill">✅ 1000+</span>
+      <span class="hdr-pill">🛡 48s kafolat</span>
     </div>
   </div>
 </div>
 
-<!-- ═══ HOME ═══ -->
-<div class="pg on" id="p-home">
+<!-- ═══ PAGE: HOME ═══ -->
+<div class="page active" id="pg-home">
+
+  <!-- Hero -->
   <div class="hero">
-    <div class="hero-bg"></div>
+    <div class="hero-pattern"></div>
     <div class="hero-content">
       <h2>Xush kelibsiz! 👋</h2>
-      <p>Professional tozalash xizmati. Karcher apparatlari. Barcha vositalar bizdan. 48 soat kafolat.</p>
+      <p>Professional tozalash. Karcher apparatlari. Barcha vositalar bizdan. 48 soat kafolat.</p>
       <div class="hero-tags">
-        <span class="hero-tag">⚡ Birinchi -5%</span>
+        <span class="hero-tag">🎉 Birinchi -5%</span>
         <span class="hero-tag">🚗 Borish bepul</span>
         <span class="hero-tag">📦 Vositalar bizdan</span>
       </div>
     </div>
   </div>
 
-  <div class="stg">
-    <div class="st"><div class="st-i">👷</div><div class="st-v">10</div><div class="st-l">Max ishchi</div></div>
-    <div class="st"><div class="st-i">⭐</div><div class="st-v">4.9</div><div class="st-l">Reyting</div></div>
-    <div class="st"><div class="st-i">🛡</div><div class="st-v">48s</div><div class="st-l">Kafolat</div></div>
+  <!-- Stats -->
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-icon">👷</div><div class="stat-value">10</div><div class="stat-label">Max ishchi</div></div>
+    <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-value">4.9</div><div class="stat-label">Reyting</div></div>
+    <div class="stat-card"><div class="stat-icon">🛡</div><div class="stat-value">48s</div><div class="stat-label">Kafolat</div></div>
   </div>
 
-  <div class="sec-t"><h3>🛠 Xizmatlar</h3><a onclick="go('order');initOrder()">Hammasi →</a></div>
-  <div class="sg" id="home-srvs"></div>
+  <!-- Services -->
+  <div class="section-header">
+    <div class="section-title">🛠 Xizmatlar</div>
+    <div class="section-link" onclick="navigate('order');initOrder()">Hammasi →</div>
+  </div>
+  <div class="service-grid" id="homeServices"></div>
 
-  <div class="sec-t" style="margin-top:12px"><h3>✨ Afzalliklar</h3></div>
-  <div class="cd">
-    <div class="ft"><div class="ft-i">⚡</div><div class="ft-txt">Professional Karcher apparatlari</div></div>
-    <div class="ft"><div class="ft-i">🧴</div><div class="ft-txt">Barcha tozalash vositalari bizdan</div></div>
-    <div class="ft"><div class="ft-i">🚗</div><div class="ft-txt">Borish narxga kiritilgan — bepul</div></div>
-    <div class="ft"><div class="ft-i">🛡</div><div class="ft-txt">48 soat sifat kafolati</div></div>
-    <div class="ft"><div class="ft-i">⏰</div><div class="ft-txt">Har kuni 09:00–17:00</div></div>
-    <div class="ft"><div class="ft-i">🌟</div><div class="ft-txt">VIP, chegirmalar, bonus tizimi</div></div>
+  <!-- Features -->
+  <div class="section-header"><div class="section-title">✨ Nima uchun biz?</div></div>
+  <div class="card">
+    <div class="feature"><div class="feature-icon">⚡</div><div class="feature-text">Professional Karcher apparatlari</div></div>
+    <div class="feature"><div class="feature-icon">🧴</div><div class="feature-text">Barcha tozalash vositalari bizdan</div></div>
+    <div class="feature"><div class="feature-icon">🚗</div><div class="feature-text">Borish narxga kiritilgan — bepul</div></div>
+    <div class="feature"><div class="feature-icon">🛡</div><div class="feature-text">48 soat sifat kafolati</div></div>
+    <div class="feature"><div class="feature-icon">⏰</div><div class="feature-text">Har kuni 09:00 — 17:00</div></div>
+    <div class="feature"><div class="feature-icon">🌟</div><div class="feature-text">VIP, chegirmalar, bonus tizimi</div></div>
   </div>
 
-  <div class="sec-t"><h3>🎁 Chegirmalar</h3><a onclick="showPromos()">Barchasi →</a></div>
-  <div class="dg" style="margin-bottom:10px">
-    <div class="di"><div class="di-i">🎉</div><div class="di-t">Birinchi</div><div class="di-v">-5%</div><div class="di-d">1-buyurtma</div></div>
-    <div class="di"><div class="di-i">🏆</div><div class="di-t">Sodiq</div><div class="di-v">-10%</div><div class="di-d">10+ buyurtma</div></div>
-    <div class="di"><div class="di-i">🌟</div><div class="di-t">VIP</div><div class="di-v">-8%</div><div class="di-d">20+ buyurtma</div></div>
-    <div class="di"><div class="di-i">👥</div><div class="di-t">Referral</div><div class="di-v">-5%</div><div class="di-d">Do'st taklif</div></div>
+  <!-- Discounts -->
+  <div class="section-header">
+    <div class="section-title">🎁 Chegirmalar</div>
+    <div class="section-link" onclick="openPromos()">Barchasi →</div>
+  </div>
+  <div class="discount-grid" style="margin-bottom:10px">
+    <div class="discount-card"><div class="discount-icon">🎉</div><div class="discount-title">Birinchi</div><div class="discount-value">-5%</div><div class="discount-desc">1-buyurtma</div></div>
+    <div class="discount-card"><div class="discount-icon">🏆</div><div class="discount-title">Sodiq</div><div class="discount-value">-10%</div><div class="discount-desc">10+ buyurtma</div></div>
+    <div class="discount-card"><div class="discount-icon">🌟</div><div class="discount-title">VIP</div><div class="discount-value">-8%</div><div class="discount-desc">20+ buyurtma</div></div>
+    <div class="discount-card"><div class="discount-icon">👥</div><div class="discount-title">Referral</div><div class="discount-value">-5%</div><div class="discount-desc">Do'st taklif</div></div>
   </div>
 
-  <button class="btn bp" onclick="go('order');initOrder()">📝 Buyurtma berish</button>
+  <!-- CTA -->
+  <button class="btn btn-primary" onclick="navigate('order');initOrder()">📝 Buyurtma berish</button>
 </div>
 
-<!-- ═══ ORDER ═══ -->
-<div class="pg" id="p-order">
-  <div class="steps" id="osteps"></div>
-  <div id="oc"></div>
+<!-- ═══ PAGE: ORDER ═══ -->
+<div class="page" id="pg-order">
+  <div class="steps" id="orderSteps"></div>
+  <div id="orderContent"></div>
 </div>
 
-<!-- ═══ CALC ═══ -->
-<div class="pg" id="p-calc">
-  <div class="cdisp" id="cdisp">
-    <small>Taxminiy narx</small>
-    <div class="cp">500,000 <span>so'm</span></div>
-    <div class="cd2">1 ishchi × 500,000</div>
-  </div>
-  <div class="cd"><div class="cd-t">📌 Xizmat turi</div><div class="chs" id="cchs"></div></div>
-  <div class="cd" id="crng"></div>
-  <div class="cd"><div class="cd-t">📊 Taqqoslash</div><div id="ccmp"></div></div>
-  <div class="cd">
-    <div class="cd-t">🎁 Chegirmalar hisob</div>
-    <div class="dg">
-      <div class="di"><div class="di-i">🎉</div><div class="di-t">Birinchi -5%</div><div class="di-v" id="disc5">—</div></div>
-      <div class="di"><div class="di-i">🏆</div><div class="di-t">Sodiq -10%</div><div class="di-v" id="disc10">—</div></div>
-      <div class="di"><div class="di-i">⚡</div><div class="di-t">Shoshilinch</div><div class="di-v" id="discUrg" style="color:var(--e)">—</div></div>
-      <div class="di"><div class="di-i">📦</div><div class="di-t">Paket -10%</div><div class="di-v" id="discPkg">—</div></div>
-    </div>
-  </div>
-  <button class="btn bp" onclick="calcToOrder()">📝 Shu narxda buyurtma</button>
-</div>
-
-<!-- ═══ MORE ═══ -->
-<div class="pg" id="p-more">
-  <div class="mc-grid">
-    <div class="mc" onclick="showWarranty()"><div class="mc-i">🛡</div><div class="mc-n">Kafolat</div></div>
-    <div class="mc" onclick="showGift()"><div class="mc-i">🎁</div><div class="mc-n">Sovg'a</div></div>
-    <div class="mc" onclick="showPromos()"><div class="mc-i">🎄</div><div class="mc-n">Aksiya</div></div>
-    <div class="mc" onclick="showPartner()"><div class="mc-i">🤝</div><div class="mc-n">Hamkor</div></div>
-    <div class="mc" onclick="showHome()"><div class="mc-i">🏠</div><div class="mc-n">Uy profil</div></div>
-    <div class="mc" onclick="showMembership()"><div class="mc-i">💎</div><div class="mc-n">A'zolik</div></div>
-    <div class="mc" onclick="showCompare()"><div class="mc-i">📊</div><div class="mc-n">Taqqoslash</div></div>
-    <div class="mc" onclick="showPrivacy()"><div class="mc-i">🔐</div><div class="mc-n">Maxfiylik</div></div>
-    <div class="mc" onclick="showSettings()"><div class="mc-i">⚙️</div><div class="mc-n">Sozlamalar</div></div>
+<!-- ═══ PAGE: CALC ═══ -->
+<div class="page" id="pg-calc">
+  <div class="calc-display" id="calcDisplay">
+    <div class="calc-display-label">Taxminiy narx</div>
+    <div class="calc-display-price">500,000 <span>so'm</span></div>
+    <div class="calc-display-detail">1 ishchi × 500,000</div>
   </div>
 
-  <div class="sec-t"><h3>❓ FAQ</h3><a onclick="renderFaq();el('faq-sec').scrollIntoView()">Hammasi →</a></div>
-  <div class="cd">
-    <div class="srch"><span class="srch-i">🔍</span><input class="fi srch-input" id="faq-srch" placeholder="Savolni qidiring..." oninput="renderFaq(this.value)"></div>
-    <div id="faq-list"></div>
+  <div class="card">
+    <div class="card-header">📌 Xizmat turi</div>
+    <div class="chips" id="calcChips"></div>
   </div>
 
-  <div class="sec-t" id="faq-sec"><h3>📰 Maslahatlar</h3></div>
-  <div class="tabs">
-    <div class="tab on" onclick="renderTips('all');this.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));this.classList.add('on')">Hammasi</div>
-    <div class="tab" onclick="renderTips('🧹 Tozalash');this.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));this.classList.add('on')">Tozalash</div>
-    <div class="tab" onclick="renderTips('🛋 Mebel');this.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));this.classList.add('on')">Mebel</div>
-    <div class="tab" onclick="renderTips('🟫 Gilam');this.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));this.classList.add('on')">Gilam</div>
-  </div>
-  <div id="tips-list"></div>
+  <div class="card" id="calcSlider"></div>
 
-  <div class="sec-t"><h3>💰 Narxlar</h3></div>
-  <div class="plc">🏠 Tozalash</div>
-  <div class="pli"><span>🧹 Oddiy / General</span><span class="plv">500,000/ishchi</span></div>
-  <div class="pli"><span>🔨 Remont keyin</span><span class="plv">600,000/ishchi</span></div>
-  <div class="plc">🛋 Mebel</div>
-  <div class="pli"><span>🛋 Divan (min 5)</span><span class="plv">80,000/o'rin</span></div>
-  <div class="pli"><span>💺 Stul (min 5)</span><span class="plv">50,000/dona</span></div>
-  <div class="plc">🟫 Gilam va fasad</div>
-  <div class="pli"><span>🟫 Gilam (min 10)</span><span class="plv">27,000/kv.m</span></div>
-  <div class="pli"><span>🏢 Fasad</span><span class="plv">22,000/kv.m</span></div>
-  <div class="pli"><span>🧱 Plitka</span><span class="plv">15,000/kv.m</span></div>
-
-  <div class="sec-t" style="margin-top:10px"><h3>📞 Aloqa</h3></div>
-  <a class="ct" href="tel:+998887887011"><div class="ct-i" style="background:#D1FAE5">📞</div><div><div class="ct-n">Qo'ng'iroq qilish</div><div class="ct-v">+998 88 788 7011</div></div><div class="ct-arr">→</div></a>
-  <a class="ct" href="https://t.me/tozalash_servis" target="_blank"><div class="ct-i" style="background:#DBEAFE">📢</div><div><div class="ct-n">Telegram kanal</div><div class="ct-v">@tozalash_servis</div></div><div class="ct-arr">→</div></a>
-  <a class="ct" href="https://instagram.com/tozalash.servis" target="_blank"><div class="ct-i" style="background:#FCE7F3">📸</div><div><div class="ct-n">Instagram</div><div class="ct-v">@tozalash.servis</div></div><div class="ct-arr">→</div></a>
-</div>
-
-<!-- ═══ PROFILE ═══ -->
-<div class="pg" id="p-me">
-  <div class="cd" id="pcard"></div>
-
-  <div class="cd">
-    <div class="cd-t">🏅 Yutuqlar</div>
-    <div id="achbox"></div>
+  <div class="card">
+    <div class="card-header">📊 Narx taqqoslash</div>
+    <div id="calcCompare"></div>
   </div>
 
-  <div class="cd">
-    <div class="cd-t">👥 Referral dasturi</div>
-    <div class="ref-box">
-      <div class="ref-code" id="rfc">TS----</div>
-      <div class="ref-lbl">Do'stingizga yuboring — ikkalangiz 5% chegirma!</div>
-    </div>
-    <div class="br">
-      <button class="btn bo" onclick="cpRef()">📋 Nusxalash</button>
-      <button class="btn bp" onclick="shareRef()">📤 Ulashish</button>
+  <div class="card">
+    <div class="card-header">🎁 Chegirmalar bilan</div>
+    <div class="discount-grid">
+      <div class="discount-card"><div class="discount-icon">🎉</div><div class="discount-title">Birinchi</div><div class="discount-value" id="dv5">—</div><div class="discount-desc">-5%</div></div>
+      <div class="discount-card"><div class="discount-icon">🏆</div><div class="discount-title">Sodiq</div><div class="discount-value" id="dv10">—</div><div class="discount-desc">-10%</div></div>
+      <div class="discount-card"><div class="discount-icon">⚡</div><div class="discount-title">Shoshilinch</div><div class="discount-value" id="dvU" style="color:var(--err)">—</div><div class="discount-desc">+25%</div></div>
+      <div class="discount-card"><div class="discount-icon">📦</div><div class="discount-title">Paket</div><div class="discount-value" id="dvP">—</div><div class="discount-desc">-10%</div></div>
     </div>
   </div>
 
-  <div class="cd">
-    <div class="cd-t">💎 A'zolik</div>
-    <div style="text-align:center;padding:16px 0">
-      <div style="font-size:32px;margin-bottom:8px">💎</div>
+  <button class="btn btn-primary" onclick="calcToOrder()">📝 Shu narxda buyurtma</button>
+</div>
+
+<!-- ═══ PAGE: MORE ═══ -->
+<div class="page" id="pg-more">
+  <!-- Quick Actions -->
+  <div class="mini-grid">
+    <div class="mini-card" onclick="openWarranty()"><div class="mini-icon">🛡</div><div class="mini-label">Kafolat</div></div>
+    <div class="mini-card" onclick="openGift()"><div class="mini-icon">🎁</div><div class="mini-label">Sovg'a</div></div>
+    <div class="mini-card" onclick="openPromos()"><div class="mini-icon">🎄</div><div class="mini-label">Aksiya</div></div>
+    <div class="mini-card" onclick="openPartner()"><div class="mini-icon">🤝</div><div class="mini-label">Hamkor</div></div>
+    <div class="mini-card" onclick="openHomeProfile()"><div class="mini-icon">🏠</div><div class="mini-label">Uy profil</div></div>
+    <div class="mini-card" onclick="openMembership()"><div class="mini-icon">💎</div><div class="mini-label">A'zolik</div></div>
+    <div class="mini-card" onclick="openCompare()"><div class="mini-icon">📊</div><div class="mini-label">Taqqoslash</div></div>
+    <div class="mini-card" onclick="openPrivacy()"><div class="mini-icon">🔐</div><div class="mini-label">Maxfiylik</div></div>
+    <div class="mini-card" onclick="openSettings()"><div class="mini-icon">⚙️</div><div class="mini-label">Sozlama</div></div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section-header"><div class="section-title">❓ Savollar</div></div>
+  <div class="card">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input class="form-input" id="faqSearch" placeholder="Savol qidirish..." oninput="renderFaq(this.value)">
+    </div>
+    <div id="faqList"></div>
+  </div>
+
+  <!-- Tips -->
+  <div class="section-header"><div class="section-title">📰 Maslahatlar</div></div>
+  <div class="tabs" id="tipTabs">
+    <div class="tab-item active" data-cat="all" onclick="selectTipTab(this,'all')">Hammasi</div>
+    <div class="tab-item" data-cat="cleaning" onclick="selectTipTab(this,'🧹 Tozalash')">Tozalash</div>
+    <div class="tab-item" data-cat="furniture" onclick="selectTipTab(this,'🛋 Mebel')">Mebel</div>
+    <div class="tab-item" data-cat="carpet" onclick="selectTipTab(this,'🟫 Gilam')">Gilam</div>
+  </div>
+  <div id="tipsList"></div>
+
+  <!-- Prices -->
+  <div class="section-header"><div class="section-title">💰 Narxlar</div></div>
+  <div class="price-category">🏠 Tozalash</div>
+  <div class="price-row"><span>🧹 Oddiy / General</span><span class="price-value">500,000/ishchi</span></div>
+  <div class="price-row"><span>🔨 Remont keyin</span><span class="price-value">600,000/ishchi</span></div>
+  <div class="price-category">🛋 Mebel</div>
+  <div class="price-row"><span>🛋 Divan (min 5)</span><span class="price-value">80,000/o'rin</span></div>
+  <div class="price-row"><span>💺 Stul (min 5)</span><span class="price-value">50,000/dona</span></div>
+  <div class="price-category">🟫 Gilam va fasad</div>
+  <div class="price-row"><span>🟫 Gilam (min 10)</span><span class="price-value">27,000/kv.m</span></div>
+  <div class="price-row"><span>🏢 Fasad</span><span class="price-value">22,000/kv.m</span></div>
+  <div class="price-row"><span>🧱 Plitka</span><span class="price-value">15,000/kv.m</span></div>
+
+  <div class="card" style="margin-top:10px">
+    <div class="card-header">ℹ️ Qo'shimcha</div>
+    <div class="feature"><div class="feature-icon">🚗</div><div class="feature-text">Borish bepul</div></div>
+    <div class="feature"><div class="feature-icon">📦</div><div class="feature-text">Vositalar bizdan</div></div>
+    <div class="feature"><div class="feature-icon">👷</div><div class="feature-text">Max 10 ishchi</div></div>
+    <div class="feature"><div class="feature-icon">⏰</div><div class="feature-text">09:00 — 17:00</div></div>
+  </div>
+
+  <!-- Contacts -->
+  <div class="section-header"><div class="section-title">📞 Aloqa</div></div>
+  <a class="contact-card" href="tel:+998887887011">
+    <div class="contact-icon" style="background:var(--ok-bg)">📞</div>
+    <div><div class="contact-name">Qo'ng'iroq</div><div class="contact-value">+998 88 788 7011</div></div>
+    <div class="contact-arrow">→</div>
+  </a>
+  <a class="contact-card" href="https://t.me/tozalash_servis" target="_blank">
+    <div class="contact-icon" style="background:var(--p-bg)">📢</div>
+    <div><div class="contact-name">Telegram</div><div class="contact-value">@tozalash_servis</div></div>
+    <div class="contact-arrow">→</div>
+  </a>
+  <a class="contact-card" href="https://instagram.com/tozalash.servis" target="_blank">
+    <div class="contact-icon" style="background:#FCE7F3">📸</div>
+    <div><div class="contact-name">Instagram</div><div class="contact-value">@tozalash.servis</div></div>
+    <div class="contact-arrow">→</div>
+  </a>
+</div>
+
+<!-- ═══ PAGE: PROFILE ═══ -->
+<div class="page" id="pg-me">
+  <div class="card" id="profileCard"></div>
+
+  <div class="card">
+    <div class="card-header">🏅 Yutuqlar</div>
+    <div id="achievementsList"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">👥 Referral dasturi</div>
+    <div class="referral-box">
+      <div class="referral-code" id="refCode">TS----</div>
+      <div class="referral-label">Do'stingizga yuboring — ikkalangiz 5% chegirma!</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="copyRefCode()">📋 Nusxalash</button>
+      <button class="btn btn-primary" onclick="shareRefCode()">📤 Ulashish</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">💎 A'zolik</div>
+    <div style="text-align:center;padding:14px 0">
+      <div style="font-size:30px;margin-bottom:6px">💎</div>
       <div style="font-size:14px;font-weight:700;margin-bottom:4px">Premium a'zolik</div>
-      <div style="font-size:12px;color:var(--t3);margin-bottom:12px">Har buyurtmada -10% dan -20% gacha</div>
-      <button class="btn bp" onclick="showMembership()">💎 A'zolikni ko'rish</button>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:12px">Har buyurtmada -10% dan -20% gacha</div>
+      <button class="btn btn-primary" onclick="openMembership()">💎 Rejalarni ko'rish</button>
     </div>
   </div>
 
-  <div class="cd">
-    <div class="cd-t">⚙️ Boshqaruv</div>
-    <div class="oi" onclick="showSettings()"><div class="oi-ic" style="background:#F1F5F9">⚙️</div><div class="oi-info"><div class="oi-n">Sozlamalar</div><div class="oi-d">Til, bildirishnomalar, mavzu</div></div><div class="oi-r">→</div></div>
-    <div class="oi" onclick="showPrivacy()"><div class="oi-ic" style="background:#F1F5F9">🔐</div><div class="oi-info"><div class="oi-n">Maxfiylik</div><div class="oi-d">Ma'lumotlarim va xavfsizlik</div></div><div class="oi-r">→</div></div>
-    <div class="oi" onclick="showHome()"><div class="oi-ic" style="background:#F0FDF4">🏠</div><div class="oi-info"><div class="oi-n">Uy profili</div><div class="oi-d">Manzil va xona ma'lumotlari</div></div><div class="oi-r">→</div></div>
+  <div class="card">
+    <div class="card-header">⚙️ Boshqaruv</div>
+    <div class="list-item" onclick="openSettings()">
+      <div class="list-icon" style="background:var(--bg2)">⚙️</div>
+      <div class="list-info"><div class="list-title">Sozlamalar</div><div class="list-subtitle">Til, bildirishnomalar, mavzu</div></div>
+      <div class="list-right">→</div>
+    </div>
+    <div class="list-item" onclick="openPrivacy()">
+      <div class="list-icon" style="background:var(--bg2)">🔐</div>
+      <div class="list-info"><div class="list-title">Maxfiylik</div><div class="list-subtitle">Ma'lumotlarim va xavfsizlik</div></div>
+      <div class="list-right">→</div>
+    </div>
+    <div class="list-item" onclick="openHomeProfile()">
+      <div class="list-icon" style="background:var(--ok-bg)">🏠</div>
+      <div class="list-info"><div class="list-title">Uy profili</div><div class="list-subtitle">Manzil va xona ma'lumotlari</div></div>
+      <div class="list-right">→</div>
+    </div>
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- ═══ BOTTOM NAV ═══ -->
 <div class="bnav">
-  <div class="bi on" onclick="go('home')"><div class="bi-ic">🏠</div><span>Asosiy</span></div>
-  <div class="bi" onclick="go('order');initOrder()"><div class="bi-ic">📝</div><span>Buyurtma</span></div>
-  <div class="bi" onclick="go('calc')"><div class="bi-ic">🧮</div><span>Hisob</span></div>
-  <div class="bi" onclick="go('more')"><div class="bi-ic">📋</div><span>Ko'proq</span></div>
-  <div class="bi" onclick="go('me')"><div class="bi-ic">👤</div><span>Profil</span></div>
+  <div class="bnav-item active" onclick="navigate('home')" data-page="home">
+    <div class="bnav-icon">🏠</div><span class="bnav-label">Asosiy</span>
+  </div>
+  <div class="bnav-item" onclick="navigate('order');initOrder()" data-page="order">
+    <div class="bnav-icon">📝</div><span class="bnav-label">Buyurtma</span>
+  </div>
+  <div class="bnav-item" onclick="navigate('calc')" data-page="calc">
+    <div class="bnav-icon">🧮</div><span class="bnav-label">Hisob</span>
+  </div>
+  <div class="bnav-item" onclick="navigate('more')" data-page="more">
+    <div class="bnav-icon">📋</div><span class="bnav-label">Ko'proq</span>
+  </div>
+  <div class="bnav-item" onclick="navigate('me')" data-page="me">
+    <div class="bnav-icon">👤</div><span class="bnav-label">Profil</span>
+  </div>
 </div>
 
 <script src="app.js"></script>
