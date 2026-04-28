@@ -1,3 +1,18 @@
+// XSS himoya
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
+// Barcha dynamic HTML da esc() ishlatish
+// Masalan:
+// '<div>' + name + '</div>'  ← XATO
+// '<div>' + esc(name) + '</div>'  ← TO'G'RI
 'use strict';
 
 // ═══════════════════════════════════════
