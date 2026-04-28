@@ -1,30 +1,36 @@
 'use strict';
 
 // ═══════════════════════════════════════
-//  TELEGRAM WEBAPP INIT
+//  TELEGRAM INIT
 // ═══════════════════════════════════════
-const tg = window.Telegram.WebApp;
+var tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
-const U = tg.initDataUnsafe?.user || {};
+var U = tg.initDataUnsafe ? tg.initDataUnsafe.user || {} : {};
 if (tg.colorScheme === 'dark') document.body.classList.add('dark');
 
+// Haptic feedback
+function haptic(type) {
+  try {
+    if (type === 'light') tg.HapticFeedback.impactOccurred('light');
+    else if (type === 'medium') tg.HapticFeedback.impactOccurred('medium');
+    else if (type === 'heavy') tg.HapticFeedback.impactOccurred('heavy');
+    else if (type === 'success') tg.HapticFeedback.notificationOccurred('success');
+    else if (type === 'error') tg.HapticFeedback.notificationOccurred('error');
+  } catch(e) {}
+}
+
 // ═══════════════════════════════════════
-//  CONFIG
+//  CONFIG & DATA
 // ═══════════════════════════════════════
-const CFG = {
+var CFG = {
   phone: '+998887887011',
   card: '5614 6817 1876 7068',
   holder: 'M.A.',
   bot: 'tozalash_servisbot',
-  channel: '@tozalash_servis',
-  insta: '@tozalash.servis',
 };
 
-// ═══════════════════════════════════════
-//  SERVICES DATA
-// ═══════════════════════════════════════
-const SVC = [
+var SVC = [
   {id:'cleaning_standard', e:'🧹', n:'Oddiy tozalash', p:500000, u:'ishchi', t:'w', hot:true},
   {id:'cleaning_general', e:'🧼', n:'General tozalash', p:500000, u:'ishchi', t:'w'},
   {id:'cleaning_renovation', e:'🔨', n:'Remont keyin', p:600000, u:'ishchi', t:'w'},
@@ -32,282 +38,230 @@ const SVC = [
   {id:'chair', e:'💺', n:'Stul yuvish', p:50000, u:'dona', mn:5, mx:50, t:'q'},
   {id:'carpet', e:'🟫', n:'Gilam yuvish', p:27000, u:'kv.m', mn:10, mx:200, t:'q'},
   {id:'facade', e:'🏢', n:'Fasad yuvish', p:22000, u:'kv.m', mn:1, mx:500, t:'q'},
-  {id:'tile', e:'🧱', n:'Plitka yuvish', p:15000, u:'kv.m', mn:1, mx:500, t:'q'},
+  {id:'tile', e:'🧱', n:'Plitka yuvish', p:15000, u:'kv.m', mn:1, mx:500, t:'q'}
 ];
 
-const DST = [
-  'Bektemir','Chilonzor','Yakkasaroy','Mirobod','Mirzo Ulugbek',
-  'Sergeli','Shayxontohur','Olmazor','Uchtepa','Yashnobod','Yunusobod'
+var DST = ['Bektemir','Chilonzor','Yakkasaroy','Mirobod','Mirzo Ulugbek','Sergeli','Shayxontohur','Olmazor','Uchtepa','Yashnobod','Yunusobod'];
+var HRS = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00'];
+var HOL = ['2025-03-30','2025-03-31','2025-04-01','2025-06-06','2025-06-07','2025-06-08'];
+
+var FAQS = [
+  {q:'Narxlar qanday?', a:"Oddiy/General: 500,000/ishchi. Remont keyin: 600,000. Divan: 80,000/o'rin (min 5). Gilam: 27,000/kv.m (min 10)."},
+  {q:'Ish vaqti?', a:'Har kuni 09:00-17:00. Bayram kunlari dam olamiz.'},
+  {q:'Vositalar kimdan?', a:'Barcha Karcher apparatlari va tozalash vositalari bizdan.'},
+  {q:"To'lov qanday?", a:'Naqd yoki karta: 5614 6817 1876 7068 (M.A.)'},
+  {q:'Qayerlarga xizmat?', a:'Toshkent shahri. Borish bepul.'},
+  {q:'Minimal buyurtma?', a:"Divan min 5 o'rin. Stul min 5. Gilam min 10 kv.m."},
+  {q:'Shoshilinch?', a:'24 soatdan kam = narx +25%.'},
+  {q:'Kafolat?', a:'48 soat ichida norozi = bepul qayta tozalash.'},
+  {q:'Ishchilar soni?', a:"Admin rasmlarni ko'rib belgilaydi (max 10)."},
+  {q:'Chegirmalar?', a:'Birinchi -5%, 10+ -10%, VIP -8%, Referral -5%.'}
 ];
 
-const HRS = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00'];
-
-const HOL = [
-  '2025-03-30','2025-03-31','2025-04-01',
-  '2025-06-06','2025-06-07','2025-06-08'
+var TIPS = [
+  {c:'🧹 Tozalash', e:'🧹', t:'Chang artish', d:"Yuqoridan pastga. Avval tokchalar, keyin pol."},
+  {c:'🧹 Tozalash', e:'✨', t:'Oyna siri', d:"Gazeta + sprey = iz qoldirmaydi."},
+  {c:'🧹 Tozalash', e:'⏰', t:'Tozalash jadvali', d:"Kun: idish, pol. Hafta: hammom. Oy: general."},
+  {c:'🛋 Mebel', e:'🛋', t:'Divan parvarishi', d:"Har 6 oyda professional tozalash tavsiya etiladi."},
+  {c:'🛋 Mebel', e:'🧴', t:"Dog' ketkazish", d:"Yangi dog' = darhol sovuq suv."},
+  {c:'🟫 Gilam', e:'🟫', t:'Gilam hidi', d:"Soda sepib 30 daqiqa, keyin changyutgich."}
 ];
 
-const FAQS = [
-  {q:'Narxlar qanday?', a:"Oddiy/General: 500,000/ishchi. Remont keyin: 600,000. Divan: 80,000/o'rin (min 5). Gilam: 27,000/kv.m (min 10). Stul: 50,000 (min 5)."},
-  {q:'Ish vaqti?', a:'Har kuni 09:00–17:00. Bayram kunlari dam olamiz.'},
-  {q:'Vositalar kimdan?', a:'Barcha Karcher apparatlari va tozalash vositalari bizdan. Siz hech narsa tayyorlashingiz shart emas.'},
-  {q:"To'lov qanday?", a:"Naqd pul yoki karta orqali. Karta: 5614 6817 1876 7068 (M.A.)"},
-  {q:'Qayerlarga xizmat?', a:'Toshkent shahri barcha tumanlari. Borish narxga kiritilgan - bepul.'},
-  {q:'Minimal buyurtma?', a:"Tozalash: min 1 ishchi. Divan: min 5 o'rin. Stul: min 5. Gilam: min 10 kv.m."},
-  {q:'Shoshilinch buyurtma?', a:'Ha! 24 soatdan kam qolsa narx 25% ga oshadi.'},
-  {q:'Kafolat bormi?', a:"Ha! 48 soat ichida sifatdan norozi bo'lsangiz BEPUL qayta tozalaymiz."},
-  {q:'Ishchilar soni?', a:"Siz rasm yuborasiz, admin ko'rib kerakli sonni belgilaydi (max 10)."},
-  {q:'Chegirmalar?', a:'Birinchi -5%. 10+ buyurtma -10%. VIP (20+) -8%. Referral -5%. Membership -10/-20%.'},
-];
-
-const TIPS = [
-  {c:'🧹 Tozalash', e:'🧹', t:'Chang artish tartibi', d:"Doim yuqoridan pastga tozalang. Avval tokchalar va shkaf ustlari, keyin pol."},
-  {c:'🧹 Tozalash', e:'✨', t:'Oyna tozalash siri', d:"Gazeta bilan oynalarni artsangiz iz qoldirmaydi! Sprey + gazeta = mukammal natija."},
-  {c:'🧹 Tozalash', e:'⏰', t:'Tozalash jadvali', d:"Har kun: idish yuvish, pol artish. Har hafta: hammom. Har oy: umumiy tozalash."},
-  {c:'🛋 Mebel', e:'🛋', t:'Divan parvarishi', d:"Har 6 oyda professional tozalash tavsiya etiladi. Yangi dog'ni darhol sovuq suv bilan yuving."},
-  {c:'🛋 Mebel', e:'🧴', t:"Dog' ketkazish", d:"Yangi dog' paydo bo'lsa darhol sovuq suv bilan yuving. Issiq suv dog'ni mustahkamlaydi!"},
-  {c:'🟫 Gilam', e:'🟫', t:'Gilam hidi ketkazish', d:"Soda sepib 30 daqiqa qo'ying, keyin changyutgich bilan oling. Hid butunlay yo'qoladi!"},
-];
-
-const ACHS = [
-  {i:'🎉', n:'Birinchi qadam', d:'1 buyurtma berdi'},
-  {i:'⭐', n:'Doimiy mijoz', d:'3 buyurtma'},
-  {i:'🌟', n:'Sodiq mijoz', d:'5 buyurtma'},
-  {i:'💎', n:'Oltin mijoz', d:'10 buyurtma'},
+var ACHS = [
+  {i:'🎉', n:'Birinchi qadam', d:'1 buyurtma'},
+  {i:'⭐', n:'Doimiy', d:'3 buyurtma'},
+  {i:'🌟', n:'Sodiq', d:'5 buyurtma'},
+  {i:'💎', n:'Oltin', d:'10 buyurtma'},
   {i:'👑', n:'Brilliant', d:'25 buyurtma'},
-  {i:'💰', n:'Millioner', d:"1M+ sarfladi"},
-  {i:'🤝', n:'Taklif ustasi', d:"3 do'st taklif qildi"},
-  {i:'📝', n:'Sharhchi', d:'Sharh qoldirdi'},
+  {i:'💰', n:'Millioner', d:'1M+ sarfladi'},
+  {i:'🤝', n:'Taklif ustasi', d:"3 do'st"},
+  {i:'📝', n:'Sharhchi', d:'Sharh qoldirdi'}
 ];
 
-const LVLS = [
+var LVLS = [
   {n:'🥉 Bronze', mn:0, mx:500},
   {n:'🥈 Silver', mn:500, mx:1500},
   {n:'🥇 Gold', mn:1500, mx:3000},
   {n:'💎 Diamond', mn:3000, mx:5000},
-  {n:'👑 Legend', mn:5000, mx:99999},
+  {n:'👑 Legend', mn:5000, mx:99999}
 ];
 
 // ═══════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════
-let picked = null;    // Tanlangan xizmat
-let step = 0;         // Buyurtma bosqichi
-let ord = {};         // Buyurtma ma'lumotlari
-let cSvc = SVC[0];   // Kalkulyator xizmati
-let cQty = 1;         // Kalkulyator miqdori
-let calM = new Date().getMonth();
-let calY = new Date().getFullYear();
-let savedHome = {};   // Saqlangan uy profili
-let sendLocked = false; // sendData bir marta ishlashi uchun
+var picked = null;
+var step = 0;
+var ord = {};
+var cSvc = SVC[0];
+var cQty = 1;
+var calM = new Date().getMonth();
+var calY = new Date().getFullYear();
+var savedHome = {};
+var sendLock = false;
 
 // ═══════════════════════════════════════
-//  UTILITY FUNCTIONS
+//  UTILS
 // ═══════════════════════════════════════
-function $(id) {
-  return document.getElementById(id);
-}
+function $(id) { return document.getElementById(id); }
 
 function F(n) {
   try {
-    const num = Math.round(Number(n) || 0);
+    var num = Math.round(Number(n) || 0);
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-  } catch(e) {
-    return '0';
-  }
+  } catch(e) { return '0'; }
 }
 
-function todayStr() {
-  return new Date().toISOString().split('T')[0];
-}
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+function isHol(d) { return HOL.indexOf(d) !== -1; }
+function isPast(d) { return d < todayStr(); }
 
-function isHoliday(d) {
-  return HOL.includes(d);
-}
-
-function isUrgent(d) {
+function isUrg(d) {
   try {
-    const target = new Date(d + 'T09:00');
-    const now = new Date();
-    const diff = target - now;
+    var diff = new Date(d + 'T09:00') - new Date();
     return diff > 0 && diff < 86400000;
-  } catch(e) {
-    return false;
-  }
+  } catch(e) { return false; }
 }
 
-function isPast(d) {
-  return d < todayStr();
-}
-
-function toast(msg, duration) {
-  const t = $('toast');
+function toast(msg, dur) {
+  var t = $('toast');
   if (!t) return;
   t.textContent = msg;
   t.classList.add('on');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(function() {
-    t.classList.remove('on');
-  }, duration || 2500);
+  clearTimeout(t._tm);
+  t._tm = setTimeout(function() { t.classList.remove('on'); }, dur || 2500);
 }
 
 function openM(html) {
-  const box = $('mBox');
-  const bg = $('mBg');
+  var box = $('mBox');
+  var bg = $('mBg');
   if (!box || !bg) return;
-  box.innerHTML = '<div class="modal-handle"></div>' + html;
+  box.innerHTML = '<div class="m-bar"></div>' + html;
   bg.classList.add('on');
   document.body.style.overflow = 'hidden';
+  haptic('light');
 }
 
 function closeM() {
-  const bg = $('mBg');
-  if (!bg) return;
-  bg.classList.remove('on');
+  var bg = $('mBg');
+  if (bg) bg.classList.remove('on');
   document.body.style.overflow = '';
 }
 
-function updateRange(el) {
+function uR(el) {
   if (!el) return;
-  var mn = Number(el.min);
-  var mx = Number(el.max);
-  var v = Number(el.value);
+  var mn = Number(el.min), mx = Number(el.max), v = Number(el.value);
   var pct = ((v - mn) / (mx - mn)) * 100;
-  el.style.background = 'linear-gradient(to right, var(--primary) ' + pct + '%, var(--bg-tertiary) ' + pct + '%)';
+  el.style.background = 'linear-gradient(to right, var(--p) ' + pct + '%, var(--bg3) ' + pct + '%)';
 }
 
-function sendData(data) {
-  if (sendLocked) {
-    toast('⏳ Yuborilmoqda...');
-    return;
-  }
+function sendD(data) {
+  if (sendLock) return;
   try {
-    sendLocked = true;
+    sendLock = true;
     tg.sendData(JSON.stringify(data));
-    setTimeout(function() { sendLocked = false; }, 3000);
+    setTimeout(function() { sendLock = false; }, 3000);
   } catch(e) {
-    sendLocked = false;
-    console.warn('sendData error:', e);
+    sendLock = false;
     toast('❌ Yuborib bo\'lmadi');
   }
 }
 
-function copyText(txt) {
+function cpTxt(t) {
   try {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(txt);
-    } else {
+    if (navigator.clipboard) { navigator.clipboard.writeText(t); }
+    else {
       var ta = document.createElement('textarea');
-      ta.value = txt;
-      ta.style.position = 'fixed';
-      ta.style.left = '-9999px';
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
+      ta.value = t; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
     }
     toast('📋 Nusxalandi!');
-  } catch(e) {
-    toast('❌ Nusxalab bo\'lmadi');
-  }
+    haptic('success');
+  } catch(e) { toast('❌ Xato'); }
 }
 
-function getRefCode() {
-  if (U.id) {
-    return 'TS' + String(U.id).slice(-6).toUpperCase();
-  }
-  return 'TSGUEST';
-}
-
-function getLevel(pts) {
+function refCode() { return U.id ? 'TS' + String(U.id).slice(-6).toUpperCase() : 'TSGUEST'; }
+function getLvl(p) {
   for (var i = 0; i < LVLS.length; i++) {
-    if (pts >= LVLS[i].mn && pts < LVLS[i].mx) {
-      return LVLS[i];
-    }
+    if (p >= LVLS[i].mn && p < LVLS[i].mx) return LVLS[i];
   }
   return LVLS[0];
 }
-
-function getUserName() {
+function userName() {
   var parts = [];
   if (U.first_name) parts.push(U.first_name);
   if (U.last_name) parts.push(U.last_name);
   return parts.join(' ') || 'Foydalanuvchi';
 }
 
-// ═══════════════════════════════════════
-//  NAVIGATION
-// ═══════════════════════════════════════
-function go(pg) {
-  // Sahifalarni almashtirish
-  var pages = document.querySelectorAll('.page');
-  for (var i = 0; i < pages.length; i++) {
-    pages[i].classList.remove('active');
+// Confetti
+function showConfetti() {
+  var wrap = $('confetti');
+  if (!wrap) return;
+  wrap.style.display = 'block';
+  wrap.innerHTML = '';
+  var colors = ['#6C5CE7','#00CEC9','#FF6B6B','#F9CA24','#A855F7','#55EFC4'];
+  for (var i = 0; i < 40; i++) {
+    var piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDelay = Math.random() * 1.5 + 's';
+    piece.style.animationDuration = 2 + Math.random() * 1.5 + 's';
+    wrap.appendChild(piece);
   }
-  var target = $('pg-' + pg);
-  if (target) target.classList.add('active');
-
-  // Nav tugmalarni yangilash
-  var navs = document.querySelectorAll('.nav-item');
-  for (var j = 0; j < navs.length; j++) {
-    var navPg = navs[j].getAttribute('data-p');
-    if (navPg === pg) {
-      navs[j].classList.add('active');
-    } else {
-      navs[j].classList.remove('active');
-    }
-  }
-
-  // Scrollni tepaga
-  window.scrollTo({top: 0, behavior: 'smooth'});
-
-  // Sahifaga mos render
-  if (pg === 'home') drawHome();
-  if (pg === 'calc') drawCalc();
-  if (pg === 'me') drawProfile();
-  if (pg === 'more') {
-    drawFaq();
-    drawTips();
-  }
+  setTimeout(function() { wrap.style.display = 'none'; }, 4000);
 }
 
 // ═══════════════════════════════════════
-//  HOME PAGE
+//  NAV
+// ═══════════════════════════════════════
+function go(pg) {
+  var pages = document.querySelectorAll('.pg');
+  for (var i = 0; i < pages.length; i++) pages[i].classList.remove('on');
+  var target = $('pg-' + pg);
+  if (target) target.classList.add('on');
+
+  var navs = document.querySelectorAll('.ni');
+  for (var j = 0; j < navs.length; j++) {
+    navs[j].classList.toggle('on', navs[j].getAttribute('data-p') === pg);
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  haptic('light');
+
+  if (pg === 'home') drawHome();
+  if (pg === 'calc') drawCalc();
+  if (pg === 'me') drawProf();
+  if (pg === 'more') { drawFaq(); drawTips(); }
+}
+
+// ═══════════════════════════════════════
+//  HOME
 // ═══════════════════════════════════════
 function drawHome() {
   var el = $('homeSvc');
   if (!el) return;
-
   var html = '';
   for (var i = 0; i < SVC.length; i++) {
     var s = SVC[i];
     if (s.id === 'tile' || s.id === 'chair') continue;
-
-    var selClass = (picked && picked.id === s.id) ? ' sel' : '';
-    var hotBadge = s.hot ? '<div class="svc-hot">TOP</div>' : '';
-
-    html += '<div class="svc' + selClass + '" onclick="pickSvc(\'' + s.id + '\')">';
-    html += hotBadge;
-    html += '<span class="svc-emoji">' + s.e + '</span>';
-    html += '<div class="svc-name">' + s.n + '</div>';
-    html += '<div class="svc-price">' + F(s.p) + '/' + s.u + '</div>';
-    html += '</div>';
+    var sel = (picked && picked.id === s.id) ? ' sel' : '';
+    var hot = s.hot ? '<div class="sv-hot">TOP</div>' : '';
+    html += '<div class="sv' + sel + '" onclick="pickSvc(\'' + s.id + '\')">';
+    html += hot + '<span class="sv-e">' + s.e + '</span>';
+    html += '<div class="sv-n">' + s.n + '</div>';
+    html += '<div class="sv-p">' + F(s.p) + '/' + s.u + '</div></div>';
   }
   el.innerHTML = html;
 }
 
 function pickSvc(id) {
   for (var i = 0; i < SVC.length; i++) {
-    if (SVC[i].id === id) {
-      picked = SVC[i];
-      break;
-    }
+    if (SVC[i].id === id) { picked = SVC[i]; break; }
   }
+  haptic('medium');
   drawHome();
-  setTimeout(function() {
-    go('order');
-    newOrder(false);
-  }, 150);
+  setTimeout(function() { go('order'); newOrd(false); }, 150);
 }
 
 // ═══════════════════════════════════════
@@ -315,316 +269,216 @@ function pickSvc(id) {
 // ═══════════════════════════════════════
 function drawCalc() {
   drawCalcChips();
-  drawCalcSlider();
-  updateCalcDisplay();
-  drawCalcCompare();
-  drawCalcDiscounts();
+  drawCalcRange();
+  updCalc();
 }
 
 function drawCalcChips() {
-  var el = $('calcChips');
+  var el = $('cCh');
   if (!el) return;
-
   var html = '';
   for (var i = 0; i < SVC.length; i++) {
     var s = SVC[i];
     var cls = (cSvc.id === s.id) ? ' on' : '';
-    html += '<div class="chip' + cls + '" onclick="setCalcSvc(\'' + s.id + '\')">';
-    html += s.e + ' ' + s.n;
-    html += '</div>';
+    html += '<div class="ch' + cls + '" onclick="setCSvc(\'' + s.id + '\')">' + s.e + ' ' + s.n + '</div>';
   }
   el.innerHTML = html;
 }
 
-function setCalcSvc(id) {
+function setCSvc(id) {
   for (var i = 0; i < SVC.length; i++) {
-    if (SVC[i].id === id) {
-      cSvc = SVC[i];
-      break;
-    }
+    if (SVC[i].id === id) { cSvc = SVC[i]; break; }
   }
   cQty = (cSvc.t === 'w') ? 1 : (cSvc.mn || 1);
+  haptic('light');
   drawCalc();
 }
 
-function drawCalcSlider() {
-  var el = $('calcRange');
+function drawCalcRange() {
+  var el = $('cRng');
   if (!el) return;
-
   var html = '';
   if (cSvc.t === 'w') {
-    html += '<div class="card-title">👷 Ishchilar soni</div>';
-    html += '<div class="range-display" id="cRangeVal">' + cQty + ' ishchi</div>';
-    html += '<input type="range" min="1" max="10" value="' + cQty + '" id="cRangeInput"';
-    html += ' oninput="cQty=Number(this.value);updateCalcDisplay();updateRange(this)">';
-    html += '<div class="range-row"><span>1</span><span>10</span></div>';
+    html += '<div class="cd-t">👷 Ishchilar</div>';
+    html += '<div class="rv" id="cRV">' + cQty + ' ishchi</div>';
+    html += '<input type="range" min="1" max="10" value="' + cQty + '" id="cRI" oninput="cQty=Number(this.value);updCalc();uR(this)">';
+    html += '<div class="rr"><span>1</span><span>10</span></div>';
   } else {
-    var mn = cSvc.mn || 1;
-    var mx = cSvc.mx || 100;
-    html += '<div class="card-title">📊 Miqdor (' + cSvc.u + ')</div>';
-    html += '<div class="range-display" id="cRangeVal">' + cQty + ' ' + cSvc.u + '</div>';
-    html += '<input type="range" min="' + mn + '" max="' + mx + '" value="' + cQty + '" id="cRangeInput"';
-    html += ' oninput="cQty=Number(this.value);updateCalcDisplay();updateRange(this)">';
-    html += '<div class="range-row"><span>' + mn + '</span><span>' + mx + '</span></div>';
+    var mn = cSvc.mn || 1, mx = cSvc.mx || 100;
+    html += '<div class="cd-t">📊 Miqdor (' + cSvc.u + ')</div>';
+    html += '<div class="rv" id="cRV">' + cQty + ' ' + cSvc.u + '</div>';
+    html += '<input type="range" min="' + mn + '" max="' + mx + '" value="' + cQty + '" id="cRI" oninput="cQty=Number(this.value);updCalc();uR(this)">';
+    html += '<div class="rr"><span>' + mn + '</span><span>' + mx + '</span></div>';
   }
   el.innerHTML = html;
-
-  var rangeInput = $('cRangeInput');
-  if (rangeInput) updateRange(rangeInput);
+  uR($('cRI'));
 }
 
-function updateCalcDisplay() {
-  var total = cSvc.p * cQty;
-
-  var disp = $('calcTop');
-  if (disp) {
-    disp.innerHTML =
-      '<div class="calc-label">Taxminiy narx</div>' +
-      '<div class="calc-price">' + F(total) + ' <span>so\'m</span></div>' +
-      '<div class="calc-detail">' + cQty + ' ' + cSvc.u + ' × ' + F(cSvc.p) + '</div>';
-  }
-
-  var rv = $('cRangeVal');
-  if (rv) rv.textContent = cQty + ' ' + cSvc.u;
-
-  drawCalcDiscounts();
-  drawCalcCompare();
-}
-
-function drawCalcDiscounts() {
-  var total = cSvc.p * cQty;
-  var d5 = $('cd5');
-  var d10 = $('cd10');
-  var dU = $('cdU');
-  var dP = $('cdP');
-  if (d5) d5.textContent = F(Math.round(total * 0.95));
-  if (d10) d10.textContent = F(Math.round(total * 0.90));
-  if (dU) dU.textContent = '+' + F(Math.round(total * 0.25));
-  if (dP) dP.textContent = F(Math.round(total * 0.90));
-}
-
-function drawCalcCompare() {
-  var el = $('calcCmp');
-  if (!el) return;
+function updCalc() {
   var t = cSvc.p * cQty;
+  var d = $('cD');
+  if (d) d.innerHTML = '<div class="calc-lb">Taxminiy narx</div><div class="calc-pr">' + F(t) + ' <span>so\'m</span></div><div class="calc-dt">' + cQty + ' ' + cSvc.u + ' × ' + F(cSvc.p) + '</div>';
+  var rv = $('cRV');
+  if (rv) rv.textContent = cQty + ' ' + cSvc.u;
+  if ($('cd5')) $('cd5').textContent = F(Math.round(t * 0.95));
+  if ($('cd10')) $('cd10').textContent = F(Math.round(t * 0.90));
+  if ($('cdU')) $('cdU').textContent = '+' + F(Math.round(t * 0.25));
+  if ($('cdP')) $('cdP').textContent = F(Math.round(t * 0.90));
 
-  el.innerHTML =
-    '<table class="cmp-table">' +
-    '<tr><th></th><th style="color:var(--primary)">🏆 Biz</th><th>Komp. A</th><th>Komp. B</th></tr>' +
-    '<tr><td>Narx</td><td class="cmp-us">' + F(t) + '</td><td>' + F(Math.round(t*1.2)) + '</td><td>' + F(Math.round(t*1.1)) + '</td></tr>' +
-    '<tr><td>-5% bilan</td><td class="cmp-hl">' + F(Math.round(t*0.95)) + '</td><td>—</td><td>—</td></tr>' +
-    '<tr><td>Borish</td><td class="cmp-hl">Bepul</td><td>+20K</td><td>+15K</td></tr>' +
-    '<tr><td>Kafolat</td><td class="cmp-hl">48 soat</td><td>Yo\'q</td><td>24 soat</td></tr>' +
-    '</table>';
+  var cmp = $('cCmp');
+  if (cmp) {
+    cmp.innerHTML = '<table class="cmp"><tr><th></th><th style="color:var(--p)">🏆 Biz</th><th>A</th><th>B</th></tr>' +
+      '<tr><td>Narx</td><td class="cmp-us">' + F(t) + '</td><td>' + F(Math.round(t*1.2)) + '</td><td>' + F(Math.round(t*1.1)) + '</td></tr>' +
+      '<tr><td>-5%</td><td class="cmp-hl">' + F(Math.round(t*0.95)) + '</td><td>—</td><td>—</td></tr>' +
+      '<tr><td>Borish</td><td class="cmp-hl">Bepul</td><td>+20K</td><td>+15K</td></tr>' +
+      '<tr><td>Kafolat</td><td class="cmp-hl">48s</td><td>Yo\'q</td><td>24s</td></tr></table>';
+  }
 }
 
-function calcOrder() {
-  picked = cSvc;
-  go('order');
-  newOrder(true);
-}
+function calcOrd() { picked = cSvc; go('order'); newOrd(true); haptic('medium'); }
 
 // ═══════════════════════════════════════
 //  ORDER FLOW
 // ═══════════════════════════════════════
-function newOrder(fromCalc) {
+function newOrd(fromCalc) {
   if (!picked) picked = SVC[0];
   step = 0;
   var s = picked;
   ord = {
     srv: s,
     qty: fromCalc ? cQty : (s.t === 'w' ? 1 : (s.mn || 1)),
-    dist: '',
-    addr: savedHome.addr || '',
-    date: '',
-    time: '09:00',
-    phone: '',
-    pay: ''
+    dist: '', addr: savedHome.addr || '',
+    date: '', time: '09:00', phone: '', pay: ''
   };
-  drawOrder();
+  drawOrd();
 }
 
-function drawOrder() {
-  var stepsEl = $('oSteps');
-  var labelEl = $('oLabel');
-  var bodyEl = $('oBody');
-  if (!stepsEl || !bodyEl) return;
+function drawOrd() {
+  var stEl = $('oSt'), lbEl = $('oLb'), bd = $('oC');
+  if (!stEl || !bd) return;
 
-  // Steps indicator
   var titles = ['Xizmat', 'Manzil', 'Sana', "To'lov", 'Tasdiqlash'];
-  var stepsHtml = '';
+  var stHtml = '';
   for (var i = 0; i < 5; i++) {
-    var cls = 'step';
-    if (i < step) cls += ' done';
-    else if (i === step) cls += ' now';
-    stepsHtml += '<div class="' + cls + '"></div>';
+    var cls = 'stp';
+    if (i < step) cls += ' d';
+    else if (i === step) cls += ' c';
+    stHtml += '<div class="' + cls + '"></div>';
   }
-  stepsEl.innerHTML = stepsHtml;
-  if (labelEl) labelEl.textContent = (step+1) + '/5 — ' + titles[step];
+  stEl.innerHTML = stHtml;
+  if (lbEl) lbEl.textContent = (step + 1) + '/5 — ' + titles[step];
 
   var S = ord.srv;
   var html = '';
 
   switch (step) {
 
-    // ═══ STEP 0: XIZMAT VA MIQDOR ═══
+    // ═══ STEP 0 ═══
     case 0:
-      html += '<div class="card"><div class="card-title">🛠 Xizmat tanlang</div>';
-      html += '<div class="svc-grid" style="margin-bottom:14px">';
+      html += '<div class="cd"><div class="cd-t">🛠 Xizmat tanlang</div><div class="sg" style="margin-bottom:14px">';
       for (var a = 0; a < SVC.length; a++) {
         var sv = SVC[a];
-        var selCls = (ord.srv.id === sv.id) ? ' sel' : '';
-        html += '<div class="svc' + selCls + '" onclick="changeOrderSvc(\'' + sv.id + '\')">';
-        html += '<span class="svc-emoji">' + sv.e + '</span>';
-        html += '<div class="svc-name">' + sv.n + '</div>';
-        html += '<div class="svc-price">' + F(sv.p) + '/' + sv.u + '</div></div>';
+        var sc = (ord.srv.id === sv.id) ? ' sel' : '';
+        html += '<div class="sv' + sc + '" onclick="chgSvc(\'' + sv.id + '\')">';
+        html += '<span class="sv-e">' + sv.e + '</span><div class="sv-n">' + sv.n + '</div>';
+        html += '<div class="sv-p">' + F(sv.p) + '/' + sv.u + '</div></div>';
       }
       html += '</div>';
-
       if (S.t === 'w') {
-        html += '<div class="card-title">👷 Ishchilar soni</div>';
-        html += '<div class="range-display" id="oQtyVal">' + ord.qty + ' ishchi</div>';
-        html += '<input type="range" min="1" max="10" value="' + ord.qty + '" id="oQtyRange"';
-        html += ' oninput="ord.qty=Number(this.value);$(\'oQtyVal\').textContent=this.value+\' ishchi\';updateRange(this)">';
-        html += '<div class="range-row"><span>1</span><span>10</span></div>';
-        html += '<div class="input-hint">💰 ' + F(S.p) + " so'm/ishchi/kun</div>";
+        html += '<div class="cd-t">👷 Ishchilar</div>';
+        html += '<div class="rv" id="oQV">' + ord.qty + ' ishchi</div>';
+        html += '<input type="range" min="1" max="10" value="' + ord.qty + '" id="oQR" oninput="ord.qty=Number(this.value);$(\'oQV\').textContent=this.value+\' ishchi\';uR(this)">';
+        html += '<div class="rr"><span>1</span><span>10</span></div>';
+        html += '<div class="fi-hint">💰 ' + F(S.p) + " so'm/ishchi/kun</div>";
       } else {
-        html += '<div class="card-title">📊 Miqdor (' + S.u + ')</div>';
-        html += '<div class="field">';
-        html += '<input class="input" type="number" id="qtyInput" value="' + ord.qty + '" min="' + (S.mn||1) + '">';
-        html += '<div class="input-hint">Min: ' + (S.mn||1) + ' ' + S.u + ' • ' + F(S.p) + " so'm/" + S.u + '</div>';
-        html += '</div>';
+        html += '<div class="cd-t">📊 Miqdor (' + S.u + ')</div>';
+        html += '<div class="fg"><input class="fi" type="number" id="qI" value="' + ord.qty + '" min="' + (S.mn||1) + '">';
+        html += '<div class="fi-hint">Min: ' + (S.mn||1) + ' ' + S.u + ' • ' + F(S.p) + " so'm/" + S.u + '</div></div>';
       }
-      html += '</div>';
-      html += '<div class="btn-row">';
-      html += '<button class="btn btn-outline" onclick="go(\'home\')">❌ Bekor</button>';
-      html += '<button class="btn btn-primary" onclick="validateStep0()">Davom ▶</button>';
-      html += '</div>';
+      html += '</div><div class="br"><button class="btn btn-o" onclick="go(\'home\')">❌</button>';
+      html += '<button class="btn btn-p" onclick="v0()">Davom ▶</button></div>';
       break;
 
-    // ═══ STEP 1: MANZIL ═══
+    // ═══ STEP 1 ═══
     case 1:
-      html += '<div class="card"><div class="card-title">📍 Manzil</div>';
-      html += '<div class="field"><label class="label">📍 Tuman <span class="req">*</span></label>';
-      html += '<select class="input" id="distSelect">';
+      html += '<div class="cd"><div class="cd-t">📍 Manzil</div>';
+      html += '<div class="fg"><label class="fl">📍 Tuman <span class="rq">*</span></label>';
+      html += '<select class="fi" id="oD">';
       for (var b = 0; b < DST.length; b++) {
-        var sel = (ord.dist === DST[b]) ? ' selected' : '';
-        html += '<option' + sel + '>' + DST[b] + '</option>';
+        var sel2 = (ord.dist === DST[b]) ? ' selected' : '';
+        html += '<option' + sel2 + '>' + DST[b] + '</option>';
       }
       html += '</select></div>';
-      html += '<div class="field"><label class="label">🏠 Manzil <span class="req">*</span></label>';
-      html += '<input class="input" id="addrInput" placeholder="Ko\'cha, uy, mo\'ljal..." value="' + (ord.addr || '') + '">';
-      html += '<div class="input-hint">To\'liq manzil kiriting (min 5 belgi)</div></div>';
-
+      html += '<div class="fg"><label class="fl">🏠 Manzil <span class="rq">*</span></label>';
+      html += '<input class="fi" id="oA" placeholder="Ko\'cha, uy, mo\'ljal..." value="' + (ord.addr || '') + '">';
+      html += '<div class="fi-hint">To\'liq manzil (min 5 belgi)</div></div>';
       if (savedHome.addr) {
-        html += '<div style="padding:8px 10px;background:var(--primary-subtle);border-radius:var(--radius-sm);';
-        html += 'font-size:12px;cursor:pointer;border:1px solid var(--primary-light);margin-top:4px"';
-        html += ' onclick="$(\'addrInput\').value=\'' + savedHome.addr.replace(/'/g, "\\'") + '\';toast(\'✅\')">';
-        html += '📌 Saqlangan: <b>' + savedHome.addr.substring(0, 30) + '</b></div>';
+        html += '<div style="padding:8px 10px;background:var(--p-bg);border-radius:var(--r3);font-size:12px;cursor:pointer;border:1px solid var(--p-bg2);margin-top:4px" ';
+        html += 'onclick="$(\'oA\').value=\'' + savedHome.addr.replace(/'/g, '') + '\';toast(\'✅\')">📌 ' + savedHome.addr.substring(0, 30) + '</div>';
       }
-      html += '</div>';
-      html += '<div class="btn-row">';
-      html += '<button class="btn btn-outline" onclick="step--;drawOrder()">◀ Orqaga</button>';
-      html += '<button class="btn btn-primary" onclick="validateStep1()">Davom ▶</button>';
-      html += '</div>';
+      html += '</div><div class="br"><button class="btn btn-o" onclick="step--;drawOrd()">◀</button>';
+      html += '<button class="btn btn-p" onclick="v1()">Davom ▶</button></div>';
       break;
 
-    // ═══ STEP 2: SANA VA VAQT ═══
+    // ═══ STEP 2 ═══
     case 2:
-      html += '<div class="card"><div class="card-title">📅 Sanani tanlang</div>';
-      html += '<div id="calendarBox"></div></div>';
-      html += '<div class="card"><div class="card-title">⏰ Boshlanish vaqti</div>';
-      html += '<div class="chips" id="timeChips"></div></div>';
-
-      if (ord.date && isUrgent(ord.date)) {
-        html += '<div class="urgent-card">';
-        html += '<div class="urgent-label">SHOSHILINCH BUYURTMA</div>';
-        html += '<div class="urgent-value">+25%</div>';
-        html += '<div class="urgent-desc">24 soatdan kam vaqt qolgan</div></div>';
+      html += '<div class="cd"><div class="cd-t">📅 Sana</div><div id="calBox"></div></div>';
+      html += '<div class="cd"><div class="cd-t">⏰ Vaqt</div><div class="chs" id="tCh"></div></div>';
+      if (ord.date && isUrg(ord.date)) {
+        html += '<div class="urg"><div class="urg-lb">SHOSHILINCH</div><div class="urg-v">+25%</div><div class="urg-d">24 soatdan kam</div></div>';
       }
-
-      html += '<div class="btn-row">';
-      html += '<button class="btn btn-outline" onclick="step--;drawOrder()">◀ Orqaga</button>';
-      html += '<button class="btn btn-primary" onclick="validateStep2()">Davom ▶</button>';
-      html += '</div>';
+      html += '<div class="br"><button class="btn btn-o" onclick="step--;drawOrd()">◀</button>';
+      html += '<button class="btn btn-p" onclick="v2()">Davom ▶</button></div>';
       break;
 
-    // ═══ STEP 3: TELEFON VA TO'LOV ═══
+    // ═══ STEP 3 ═══
     case 3:
-      html += '<div class="card"><div class="card-title">📱 Aloqa</div>';
-      html += '<div class="field"><label class="label">📞 Telefon <span class="req">*</span></label>';
-      html += '<div class="input-wrap"><span class="input-icon">📱</span>';
-      html += '<input class="input" type="tel" id="phoneInput" placeholder="+998 90 123 45 67" value="' + (ord.phone || '') + '">';
-      html += '</div></div></div>';
-
-      html += '<div class="card"><div class="card-title">💳 To\'lov usuli</div>';
-      html += '<div class="chips" style="margin-bottom:10px">';
-      html += '<div class="chip' + (ord.pay === 'cash' ? ' on' : '') + '" onclick="ord.pay=\'cash\';drawOrder()">💵 Naqd pul</div>';
-      html += '<div class="chip' + (ord.pay === 'card' ? ' on' : '') + '" onclick="ord.pay=\'card\';drawOrder()">💳 Karta</div>';
-      html += '</div>';
-
+      html += '<div class="cd"><div class="cd-t">📱 Aloqa</div>';
+      html += '<div class="fg"><label class="fl">📞 Telefon <span class="rq">*</span></label>';
+      html += '<div class="fi-wrap"><span class="fi-ico">📱</span>';
+      html += '<input class="fi" type="tel" id="oPh" placeholder="+998 90 123 45 67" value="' + (ord.phone || '') + '"></div></div></div>';
+      html += '<div class="cd"><div class="cd-t">💳 To\'lov</div><div class="chs" style="margin-bottom:10px">';
+      html += '<div class="ch' + (ord.pay === 'cash' ? ' on' : '') + '" onclick="ord.pay=\'cash\';haptic(\'light\');drawOrd()">💵 Naqd</div>';
+      html += '<div class="ch' + (ord.pay === 'card' ? ' on' : '') + '" onclick="ord.pay=\'card\';haptic(\'light\');drawOrd()">💳 Karta</div></div>';
       if (ord.pay === 'card') {
-        html += '<div class="pay-card"><div class="pay-card-logo">💳</div>';
-        html += '<div class="pay-card-label">TO\'LOV KARTASI</div>';
-        html += '<div class="pay-card-num">' + CFG.card + '</div>';
-        html += '<div class="pay-card-name">' + CFG.holder + '</div></div>';
-        html += '<div class="input-hint">Buyurtma tasdiqlangach kartaga o\'tkazing</div>';
+        html += '<div class="payc"><div class="payc-logo">💳</div><div class="payc-lb">TO\'LOV KARTASI</div>';
+        html += '<div class="payc-num">' + CFG.card + '</div><div class="payc-name">' + CFG.holder + '</div></div>';
+        html += '<div class="fi-hint">Tasdiqlangach kartaga o\'tkazing</div>';
       }
-      html += '</div>';
-      html += '<div class="btn-row">';
-      html += '<button class="btn btn-outline" onclick="step--;drawOrder()">◀ Orqaga</button>';
-      html += '<button class="btn btn-primary" onclick="validateStep3()">Davom ▶</button>';
-      html += '</div>';
+      html += '</div><div class="br"><button class="btn btn-o" onclick="step--;drawOrd()">◀</button>';
+      html += '<button class="btn btn-p" onclick="v3()">Davom ▶</button></div>';
       break;
 
-    // ═══ STEP 4: TASDIQLASH ═══
+    // ═══ STEP 4 ═══
     case 4:
-      var basePrice = S.p * ord.qty;
-      var urg = isUrgent(ord.date);
-      var urgAmount = urg ? Math.round(basePrice * 0.25) : 0;
-      var finalPrice = basePrice + urgAmount;
+      var base = S.p * ord.qty;
+      var urg = isUrg(ord.date);
+      var urgA = urg ? Math.round(base * 0.25) : 0;
+      var fin = base + urgA;
 
-      html += '<div class="summary">';
-      html += '<div class="summary-head">📋 Buyurtma xulosasi</div>';
-      html += '<div class="summary-row"><span class="lbl">Xizmat</span><span class="val">' + S.e + ' ' + S.n + '</span></div>';
-      html += '<div class="summary-row"><span class="lbl">Miqdor</span><span class="val">' + ord.qty + ' ' + S.u + '</span></div>';
-      html += '<div class="summary-row"><span class="lbl">Tuman</span><span class="val">📍 ' + ord.dist + '</span></div>';
-      html += '<div class="summary-row"><span class="lbl">Manzil</span><span class="val">' + ord.addr + '</span></div>';
-      html += '<div class="summary-row"><span class="lbl">Sana</span><span class="val">📅 ' + ord.date + '</span></div>';
-      html += '<div class="summary-row"><span class="lbl">Vaqt</span><span class="val">⏰ ' + ord.time + '</span></div>';
-      html += '<div class="summary-row"><span class="lbl">Telefon</span><span class="val">📱 ' + ord.phone + '</span></div>';
-      html += '<div class="summary-row"><span class="lbl">To\'lov</span><span class="val">' + (ord.pay === 'card' ? '💳 Karta' : '💵 Naqd') + '</span></div>';
-      html += '<div class="summary-row"><span class="lbl">Asosiy narx</span><span class="val">' + F(basePrice) + ' so\'m</span></div>';
-
-      if (urg) {
-        html += '<div class="summary-row"><span class="lbl" style="color:var(--danger)">⚡ Shoshilinch</span>';
-        html += '<span class="val" style="color:var(--danger)">+' + F(urgAmount) + ' so\'m</span></div>';
-      }
-
-      html += '<div class="summary-row summary-total"><span>JAMI</span><span>' + F(finalPrice) + ' so\'m</span></div>';
-      html += '</div>';
-
-      html += '<button class="btn btn-success" onclick="submitOrder(' + finalPrice + ')" style="font-size:16px;padding:16px">✅ BUYURTMA BERISH</button>';
-      html += '<button class="btn btn-ghost" onclick="step--;drawOrder()">◀ Orqaga</button>';
+      html += '<div class="sum"><div class="sum-h">📋 Buyurtma xulosasi</div>';
+      html += '<div class="sr"><span class="lb">Xizmat</span><span class="vl">' + S.e + ' ' + S.n + '</span></div>';
+      html += '<div class="sr"><span class="lb">Miqdor</span><span class="vl">' + ord.qty + ' ' + S.u + '</span></div>';
+      html += '<div class="sr"><span class="lb">Tuman</span><span class="vl">📍 ' + ord.dist + '</span></div>';
+      html += '<div class="sr"><span class="lb">Manzil</span><span class="vl">' + ord.addr + '</span></div>';
+      html += '<div class="sr"><span class="lb">Sana</span><span class="vl">📅 ' + ord.date + '</span></div>';
+      html += '<div class="sr"><span class="lb">Vaqt</span><span class="vl">⏰ ' + ord.time + '</span></div>';
+      html += '<div class="sr"><span class="lb">Telefon</span><span class="vl">📱 ' + ord.phone + '</span></div>';
+      html += '<div class="sr"><span class="lb">To\'lov</span><span class="vl">' + (ord.pay === 'card' ? '💳 Karta' : '💵 Naqd') + '</span></div>';
+      html += '<div class="sr"><span class="lb">Narx</span><span class="vl">' + F(base) + '</span></div>';
+      if (urg) html += '<div class="sr"><span class="lb" style="color:var(--ac)">⚡ Shoshilinch</span><span class="vl" style="color:var(--ac)">+' + F(urgA) + '</span></div>';
+      html += '<div class="sr tot"><span>JAMI</span><span>' + F(fin) + ' so\'m</span></div></div>';
+      html += '<button class="btn btn-ok" onclick="submit(' + fin + ')" style="font-size:16px;padding:16px">✅ BUYURTMA BERISH</button>';
+      html += '<button class="btn btn-gh" onclick="step--;drawOrd()">◀ Orqaga</button>';
       break;
   }
 
-  bodyEl.innerHTML = html;
-
-  // Range init
-  if (step === 0) {
-    var oRange = $('oQtyRange');
-    if (oRange) updateRange(oRange);
-  }
-
-  // Calendar va Time init
-  if (step === 2) {
-    drawCalendar();
-    drawTimeChips();
-  }
+  bd.innerHTML = html;
+  if (step === 0 && $('oQR')) uR($('oQR'));
+  if (step === 2) { drawCal(); drawTime(); }
 }
 
-function changeOrderSvc(id) {
+function chgSvc(id) {
   for (var i = 0; i < SVC.length; i++) {
     if (SVC[i].id === id) {
       ord.srv = SVC[i];
@@ -632,368 +486,228 @@ function changeOrderSvc(id) {
       break;
     }
   }
-  drawOrder();
+  haptic('light');
+  drawOrd();
 }
 
-// ═══ VALIDATORS ═══
-function validateStep0() {
+function v0() {
   var S = ord.srv;
   if (S.t === 'q') {
-    var input = $('qtyInput');
-    var v = input ? Number(input.value) : ord.qty;
-    if (isNaN(v) || v <= 0) { toast('❌ Son kiriting'); return; }
-    if (S.mn && v < S.mn) {
-      toast('❌ Minimal ' + S.mn + ' ' + S.u);
-      if (input) input.classList.add('err');
-      return;
-    }
-    if (S.mx && v > S.mx) {
-      toast('❌ Maksimal ' + S.mx + ' ' + S.u);
-      return;
-    }
+    var inp = $('qI');
+    var v = inp ? Number(inp.value) : ord.qty;
+    if (!v || v <= 0) { toast('❌ Son kiriting'); haptic('error'); return; }
+    if (S.mn && v < S.mn) { toast('❌ Min ' + S.mn + ' ' + S.u); haptic('error'); if (inp) inp.classList.add('err'); return; }
     ord.qty = v;
   }
-  step++;
-  drawOrder();
+  step++; haptic('light'); drawOrd();
 }
 
-function validateStep1() {
-  var addrEl = $('addrInput');
-  var distEl = $('distSelect');
-  var addr = addrEl ? addrEl.value.trim() : '';
-
-  if (!addr || addr.length < 5) {
-    toast('❌ Manzil kiriting (min 5 belgi)');
-    if (addrEl) addrEl.classList.add('err');
-    return;
-  }
-
-  ord.dist = distEl ? distEl.value : DST[0];
+function v1() {
+  var aEl = $('oA'), dEl = $('oD');
+  var addr = aEl ? aEl.value.trim() : '';
+  if (!addr || addr.length < 5) { toast('❌ Manzil kiriting'); haptic('error'); if (aEl) aEl.classList.add('err'); return; }
+  ord.dist = dEl ? dEl.value : DST[0];
   ord.addr = addr;
-  step++;
-  drawOrder();
+  step++; haptic('light'); drawOrd();
 }
 
-function validateStep2() {
-  if (!ord.date) {
-    toast('❌ Sanani tanlang');
-    return;
-  }
-  if (!ord.time) {
-    ord.time = '09:00';
-  }
-  step++;
-  drawOrder();
+function v2() {
+  if (!ord.date) { toast('❌ Sana tanlang'); haptic('error'); return; }
+  if (!ord.time) ord.time = '09:00';
+  step++; haptic('light'); drawOrd();
 }
 
-function validateStep3() {
-  var phoneEl = $('phoneInput');
-  var phone = phoneEl ? phoneEl.value.trim() : '';
-
-  if (!phone || phone.length < 9) {
-    toast('❌ Telefon raqam kiriting');
-    if (phoneEl) phoneEl.classList.add('err');
-    return;
-  }
-  if (!ord.pay) {
-    toast("❌ To'lov usulini tanlang");
-    return;
-  }
-
-  ord.phone = phone;
-  step++;
-  drawOrder();
+function v3() {
+  var phEl = $('oPh');
+  var ph = phEl ? phEl.value.trim() : '';
+  if (!ph || ph.length < 9) { toast('❌ Telefon kiriting'); haptic('error'); if (phEl) phEl.classList.add('err'); return; }
+  if (!ord.pay) { toast("❌ To'lov tanlang"); haptic('error'); return; }
+  ord.phone = ph;
+  step++; haptic('light'); drawOrd();
 }
 
-function submitOrder(price) {
-  sendData({
-    action: 'order',
-    service: ord.srv.id,
-    qty: ord.qty,
-    district: ord.dist,
-    address: ord.addr,
-    date: ord.date,
-    time: ord.time,
-    phone: ord.phone,
-    payment: ord.pay,
-    urgent: isUrgent(ord.date),
-    final_price: price
+function submit(price) {
+  sendD({
+    action: 'order', service: ord.srv.id, qty: ord.qty,
+    district: ord.dist, address: ord.addr,
+    date: ord.date, time: ord.time,
+    phone: ord.phone, payment: ord.pay,
+    urgent: isUrg(ord.date), final_price: price
   });
 
-  var bodyEl = $('oBody');
-  if (bodyEl) {
-    bodyEl.innerHTML =
-      '<div class="success">' +
-      '<span class="success-emoji">🎉</span>' +
-      '<div class="success-title">Buyurtma qabul qilindi!</div>' +
-      '<div class="success-desc">Operator tez orada bog\'lanadi va kerakli ishchilar sonini belgilaydi.</div>' +
-      '<div class="success-pill">📞 ' + CFG.phone + '</div>' +
-      '<button class="btn btn-primary" style="margin-top:16px" onclick="go(\'home\')">🏠 Asosiy sahifa</button>' +
-      '</div>';
-  }
+  showConfetti();
+  haptic('success');
 
-  var stepsEl = $('oSteps');
-  if (stepsEl) stepsEl.innerHTML = '';
-  var labelEl = $('oLabel');
-  if (labelEl) labelEl.textContent = '';
-
+  $('oC').innerHTML =
+    '<div class="succ"><span class="succ-e">🎉</span>' +
+    '<div class="succ-t">Buyurtma qabul qilindi!</div>' +
+    '<div class="succ-d">Operator tez orada bog\'lanadi va kerakli ishchilar sonini belgilaydi.</div>' +
+    '<div class="succ-id">📞 ' + CFG.phone + '</div>' +
+    '<button class="btn btn-p" style="margin-top:16px" onclick="go(\'home\')">🏠 Asosiy sahifa</button></div>';
+  $('oSt').innerHTML = '';
+  if ($('oLb')) $('oLb').textContent = '';
   toast('✅ Buyurtma yuborildi!');
 }
 
 // ═══════════════════════════════════════
 //  CALENDAR
 // ═══════════════════════════════════════
-function drawCalendar() {
-  var box = $('calendarBox');
+function drawCal() {
+  var box = $('calBox');
   if (!box) return;
+  var MO = ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avg','Sen','Okt','Noy','Dek'];
+  var DN = ['Du','Se','Ch','Pa','Ju','Sh','Ya'];
+  var first = (new Date(calY, calM, 1).getDay() + 6) % 7;
+  var days = new Date(calY, calM + 1, 0).getDate();
+  var now = todayStr();
 
-  var months = ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'];
-  var dayNames = ['Du','Se','Ch','Pa','Ju','Sh','Ya'];
-  var firstDay = (new Date(calY, calM, 1).getDay() + 6) % 7;
-  var totalDays = new Date(calY, calM + 1, 0).getDate();
-  var today = todayStr();
+  var h = '<div class="cal"><div class="cal-h">';
+  h += '<div class="cal-ar" onclick="calM--;if(calM<0){calM=11;calY--}drawCal()">‹</div>';
+  h += '<div class="cal-mo">' + MO[calM] + ' ' + calY + '</div>';
+  h += '<div class="cal-ar" onclick="calM++;if(calM>11){calM=0;calY++}drawCal()">›</div></div>';
+  h += '<div class="cal-g">';
+  for (var i = 0; i < DN.length; i++) h += '<div class="cal-dn">' + DN[i] + '</div>';
+  for (var e = 0; e < first; e++) h += '<div class="cal-d empty"></div>';
 
-  var html = '<div class="cal">';
-  html += '<div class="cal-head">';
-  html += '<div class="cal-arr" onclick="calPrev()">‹</div>';
-  html += '<div class="cal-month">' + months[calM] + ' ' + calY + '</div>';
-  html += '<div class="cal-arr" onclick="calNext()">›</div>';
-  html += '</div>';
-  html += '<div class="cal-grid">';
-
-  for (var i = 0; i < dayNames.length; i++) {
-    html += '<div class="cal-dn">' + dayNames[i] + '</div>';
-  }
-
-  for (var e = 0; e < firstDay; e++) {
-    html += '<div class="cal-d empty"></div>';
-  }
-
-  for (var d = 1; d <= totalDays; d++) {
+  for (var d = 1; d <= days; d++) {
     var ds = calY + '-' + String(calM + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
-    var past = isPast(ds);
-    var hol = isHoliday(ds);
-    var selected = (ord.date === ds);
-    var isToday = (ds === today);
-
+    var past = isPast(ds), hol = isHol(ds), sel = (ord.date === ds), today = (ds === now);
     var cls = 'cal-d';
     if (past || hol) cls += ' off';
-    else if (selected) cls += ' sel';
-    else if (isToday) cls += ' today';
+    else if (sel) cls += ' sel';
+    else if (today) cls += ' today';
     if (hol) cls += ' hol';
-
-    var click = '';
-    if (!past && !hol) {
-      click = ' onclick="selectDate(\'' + ds + '\')"';
-    }
-
-    html += '<div class="' + cls + '"' + click + '>' + d + '</div>';
+    var click = (past || hol) ? '' : ' onclick="selDate(\'' + ds + '\')"';
+    h += '<div class="' + cls + '"' + click + '>' + d + '</div>';
   }
-
-  html += '</div>';
+  h += '</div>';
 
   if (ord.date) {
-    var urg = isUrgent(ord.date);
-    var bgColor = urg ? 'var(--danger-light)' : 'var(--success-light)';
-    var textColor = urg ? 'var(--danger)' : 'var(--success)';
-    var statusText = urg ? '⚡ Shoshilinch! Narx +25%' : '✅ Tanlangan: ' + ord.date;
-
-    html += '<div style="margin-top:8px;padding:8px 10px;background:' + bgColor + ';';
-    html += 'border-radius:var(--radius-sm);font-size:11px;font-weight:500;color:' + textColor + '">';
-    html += statusText + '</div>';
+    var u = isUrg(ord.date);
+    h += '<div style="margin-top:8px;padding:8px 10px;background:' + (u ? 'var(--err-bg)' : 'var(--ok-bg)') + ';border-radius:var(--r3);font-size:11px;font-weight:500;color:' + (u ? 'var(--ac)' : 'var(--ok)') + '">' + (u ? '⚡ Shoshilinch! +25%' : '✅ ' + ord.date) + '</div>';
   }
-
-  html += '</div>';
-  box.innerHTML = html;
+  h += '</div>';
+  box.innerHTML = h;
 }
 
-function selectDate(ds) {
-  ord.date = ds;
-  drawCalendar();
-  // Urgent bo'lsa step ni qayta chizish
-  drawOrder();
-}
-
-function calPrev() {
-  calM--;
-  if (calM < 0) { calM = 11; calY--; }
-  drawCalendar();
-}
-
-function calNext() {
-  calM++;
-  if (calM > 11) { calM = 0; calY++; }
-  drawCalendar();
-}
-
-function drawTimeChips() {
-  var box = $('timeChips');
+function selDate(ds) { ord.date = ds; haptic('light'); drawCal(); drawOrd(); }
+function drawTime() {
+  var box = $('tCh');
   if (!box) return;
-
-  var html = '';
+  var h = '';
   for (var i = 0; i < HRS.length; i++) {
     var t = HRS[i];
-    var cls = (ord.time === t) ? ' on' : '';
-    html += '<div class="chip' + cls + '" onclick="selectTime(\'' + t + '\')">🕐 ' + t + '</div>';
+    h += '<div class="ch' + (ord.time === t ? ' on' : '') + '" onclick="ord.time=\'' + t + '\';haptic(\'light\');drawTime()">🕐 ' + t + '</div>';
   }
-  box.innerHTML = html;
-}
-
-function selectTime(t) {
-  ord.time = t;
-  drawTimeChips();
+  box.innerHTML = h;
 }
 
 // ═══════════════════════════════════════
 //  PROFILE
 // ═══════════════════════════════════════
-function drawProfile() {
-  var name = getUserName();
-  var pts = 150; // Demo
-  var lvl = getLevel(pts);
+function drawProf() {
+  var name = userName();
+  var pts = 150;
+  var lvl = getLvl(pts);
   var pct = Math.min(100, Math.round(((pts - lvl.mn) / (lvl.mx - lvl.mn)) * 100));
-  var refC = getRefCode();
+  var init = U.first_name ? U.first_name.charAt(0).toUpperCase() : '👤';
 
-  // Profile card
-  var pc = $('profCard');
+  var pc = $('profCd');
   if (pc) {
-    var initial = U.first_name ? U.first_name.charAt(0).toUpperCase() : '👤';
     pc.innerHTML =
       '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">' +
-      '<div style="width:48px;height:48px;background:linear-gradient(135deg,var(--primary),var(--secondary));' +
-      'border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;' +
-      'flex-shrink:0;font-weight:700;box-shadow:var(--shadow-primary)">' + initial + '</div>' +
+      '<div style="width:50px;height:50px;background:var(--p-g);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0;font-weight:700;box-shadow:0 4px 14px rgba(108,92,231,.3)">' + init + '</div>' +
       '<div style="flex:1"><div style="font-size:15px;font-weight:700">' + name + '</div>' +
-      '<div style="font-size:11px;color:var(--text-tertiary)">@' + (U.username || 'N/A') + '</div></div>' +
-      '<span class="badge badge-blue">' + lvl.n + '</span></div>' +
-
-      '<div class="level-card">' +
-      '<div class="level-emoji">' + lvl.n.split(' ')[0] + '</div>' +
-      '<div class="level-info"><div class="level-name">' + lvl.n + '</div>' +
-      '<div class="level-sub">' + F(lvl.mx - pts) + ' ball → keyingi level</div>' +
-      '<div class="progress" style="margin-top:6px;background:rgba(255,255,255,.15)">' +
-      '<div class="progress-bar" style="width:' + pct + '%;background:rgba(255,255,255,.7)"></div></div>' +
-      '</div><div class="level-pts">' + pts + '<small> ball</small></div></div>' +
-
-      '<div class="stat-row" style="margin-top:6px">' +
-      '<div class="stat"><span class="stat-emoji">📋</span><div class="stat-num">0</div><div class="stat-text">Buyurtma</div></div>' +
-      '<div class="stat"><span class="stat-emoji">💰</span><div class="stat-num">0</div><div class="stat-text">Sarflagan</div></div>' +
-      '<div class="stat"><span class="stat-emoji">👥</span><div class="stat-num">0</div><div class="stat-text">Taklif</div></div></div>';
+      '<div style="font-size:11px;color:var(--t3)">@' + (U.username || 'N/A') + '</div></div>' +
+      '<span class="bdg bdg-p">' + lvl.n + '</span></div>' +
+      '<div class="lvl"><div class="lvl-e">' + lvl.n.split(' ')[0] + '</div>' +
+      '<div class="lvl-info"><div class="lvl-n">' + lvl.n + '</div>' +
+      '<div class="lvl-sub">' + F(lvl.mx - pts) + ' ball kerak</div>' +
+      '<div class="prog" style="margin-top:6px;background:rgba(255,255,255,.15)"><div class="prog-f" style="width:' + pct + '%;background:rgba(255,255,255,.7)"></div></div></div>' +
+      '<div class="lvl-pts">' + pts + '<small> ball</small></div></div>' +
+      '<div class="stg" style="margin-top:6px">' +
+      '<div class="st"><span class="st-e">📋</span><div class="st-v">0</div><div class="st-l">Buyurtma</div></div>' +
+      '<div class="st"><span class="st-e">💰</span><div class="st-v">0</div><div class="st-l">Sarflagan</div></div>' +
+      '<div class="st"><span class="st-e">👥</span><div class="st-v">0</div><div class="st-l">Taklif</div></div></div>';
   }
 
-  // Achievements
-  var achBox = $('achBox');
-  if (achBox) {
-    var achHtml = '';
+  var ab = $('achBox');
+  if (ab) {
+    var ah = '';
     for (var i = 0; i < ACHS.length; i++) {
       var a = ACHS[i];
-      achHtml += '<div class="ach locked"><div class="ach-emoji">' + a.i + '</div>' +
-        '<div><div class="ach-name">' + a.n + '</div>' +
-        '<div class="ach-desc">🔒 ' + a.d + '</div></div></div>';
+      ah += '<div class="ach locked"><div class="ach-e">' + a.i + '</div><div><div class="ach-n">' + a.n + '</div><div class="ach-d">🔒 ' + a.d + '</div></div></div>';
     }
-    achBox.innerHTML = achHtml;
+    ab.innerHTML = ah;
   }
-
-  // Referral
-  var refEl = $('refC');
-  if (refEl) refEl.textContent = refC;
+  var rf = $('refC');
+  if (rf) rf.textContent = refCode();
 }
 
-function copyRef() {
-  var code = getRefCode();
-  copyText('https://t.me/' + CFG.bot + '?start=ref_' + code);
-}
-
-function shareRef() {
-  var code = getRefCode();
-  var url = 'https://t.me/' + CFG.bot + '?start=ref_' + code;
-  var text = 'Tozalash Servis — professional tozalash! Birinchi buyurtmaga -5%!';
-  try {
-    tg.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text));
-  } catch(e) {
-    copyText(url);
-  }
+function cpRef() { cpTxt('https://t.me/' + CFG.bot + '?start=ref_' + refCode()); }
+function shRef() {
+  var url = 'https://t.me/' + CFG.bot + '?start=ref_' + refCode();
+  try { tg.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent('Tozalash Servis — birinchi buyurtmaga -5%!')); }
+  catch(e) { cpTxt(url); }
 }
 
 // ═══════════════════════════════════════
-//  FAQ
+//  FAQ & TIPS
 // ═══════════════════════════════════════
-function drawFaq(query) {
+function drawFaq(q) {
   var box = $('faqBox');
   if (!box) return;
-
-  var q = (query || '').toLowerCase().trim();
+  var s = (q || '').toLowerCase().trim();
   var list = [];
-
   for (var i = 0; i < FAQS.length; i++) {
     var f = FAQS[i];
-    if (!q || f.q.toLowerCase().indexOf(q) !== -1 || f.a.toLowerCase().indexOf(q) !== -1) {
-      list.push(f);
-    }
+    if (!s || f.q.toLowerCase().indexOf(s) !== -1 || f.a.toLowerCase().indexOf(s) !== -1) list.push(f);
   }
-
-  if (list.length === 0) {
-    box.innerHTML =
-      '<div class="empty" style="padding:20px">' +
-      '<span class="empty-emoji">🔍</span>' +
-      '<div class="empty-title">Topilmadi</div>' +
-      '<div class="empty-desc">"' + q + '" bo\'yicha natija yo\'q</div></div>';
+  if (!list.length) {
+    box.innerHTML = '<div class="emp" style="padding:20px"><span class="emp-e">🔍</span><div class="emp-t">Topilmadi</div></div>';
     return;
   }
-
-  var html = '';
+  var h = '';
   for (var j = 0; j < list.length; j++) {
-    html += '<div class="faq" onclick="this.classList.toggle(\'open\')">';
-    html += '<div class="faq-q">' + list[j].q + '<span class="faq-icon">▼</span></div>';
-    html += '<div class="faq-a">' + list[j].a + '</div></div>';
+    h += '<div class="fq" onclick="this.classList.toggle(\'open\');haptic(\'light\')">';
+    h += '<div class="fq-q">' + list[j].q + '<span class="fq-ic">▼</span></div>';
+    h += '<div class="fq-a">' + list[j].a + '</div></div>';
   }
-  box.innerHTML = html;
+  box.innerHTML = h;
 }
 
-// ═══════════════════════════════════════
-//  TIPS
-// ═══════════════════════════════════════
-function drawTips(cat) {
+function drawTips(c) {
   var box = $('tipBox');
   if (!box) return;
-
   var list = [];
   for (var i = 0; i < TIPS.length; i++) {
-    if (!cat || cat === 'all' || TIPS[i].c === cat) {
-      list.push(TIPS[i]);
-    }
+    if (!c || c === 'all' || TIPS[i].c === c) list.push(TIPS[i]);
   }
-
-  var html = '';
+  var h = '';
   for (var j = 0; j < list.length; j++) {
     var tip = list[j];
-    html += '<div class="card" style="cursor:pointer" onclick="showTip(\'' +
-      tip.t.replace(/'/g, "\\'") + '\',\'' +
-      tip.d.replace(/'/g, "\\'") + '\')">';
-    html += '<div style="display:flex;align-items:center;gap:10px">';
-    html += '<div style="font-size:22px">' + tip.e + '</div>';
-    html += '<div style="flex:1"><div style="font-size:13px;font-weight:600">' + tip.t + '</div>';
-    html += '<div style="font-size:11px;color:var(--text-tertiary);margin-top:1px">' + tip.d.substring(0, 40) + '...</div></div>';
-    html += '<div style="color:var(--text-quaternary)">→</div></div></div>';
+    var safeD = tip.d.replace(/'/g, '');
+    var safeT = tip.t.replace(/'/g, '');
+    h += '<div class="cd" style="cursor:pointer" onclick="showTip(\'' + safeT + '\',\'' + safeD + '\')">';
+    h += '<div style="display:flex;align-items:center;gap:10px">';
+    h += '<div style="font-size:22px">' + tip.e + '</div>';
+    h += '<div style="flex:1"><div style="font-size:13px;font-weight:600">' + tip.t + '</div>';
+    h += '<div style="font-size:11px;color:var(--t3);margin-top:1px">' + tip.d.substring(0, 40) + '...</div></div>';
+    h += '<div style="color:var(--t4)">→</div></div></div>';
   }
-  box.innerHTML = html;
+  box.innerHTML = h;
 }
 
-function showTip(title, text) {
-  openM(
-    '<div class="modal-title">' + title + '</div>' +
-    '<p style="font-size:13px;line-height:1.6;color:var(--text-secondary)">' + text + '</p>' +
-    '<button class="btn btn-primary" style="margin-top:14px" onclick="closeM()">OK</button>'
-  );
+function showTip(t, d) {
+  openM('<div class="m-t">' + t + '</div><p style="font-size:13px;line-height:1.6;color:var(--t2)">' + d + '</p><button class="btn btn-p" style="margin-top:14px" onclick="closeM()">OK</button>');
 }
 
-function pickTipTab(el, cat) {
+function pickTab(el, c) {
   var tabs = document.querySelectorAll('#tipTabs .tab');
-  for (var i = 0; i < tabs.length; i++) {
-    tabs[i].classList.remove('on');
-  }
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('on');
   el.classList.add('on');
-  drawTips(cat);
+  haptic('light');
+  drawTips(c);
 }
 
 // ═══════════════════════════════════════
@@ -1001,236 +715,187 @@ function pickTipTab(el, cat) {
 // ═══════════════════════════════════════
 function openWarranty() {
   openM(
-    '<div class="modal-title">🛡 Kafolat siyosati</div>' +
-    '<div class="card" style="background:var(--success-light);border:1.5px solid rgba(0,168,107,.15);text-align:center">' +
-    '<div style="font-size:32px;margin-bottom:6px">🛡</div>' +
-    '<div style="font-size:15px;font-weight:700">48 SOAT KAFOLAT</div>' +
-    '<div style="font-size:12px;color:var(--text-secondary);margin-top:3px">Norozi = bepul qayta tozalash!</div></div>' +
-    '<div class="feat"><div class="feat-icon">✅</div><div class="feat-text">48 soat ichida murojaat qiling</div></div>' +
-    '<div class="feat"><div class="feat-icon">📸</div><div class="feat-text">Muammo rasmini yuboring</div></div>' +
-    '<div class="feat"><div class="feat-icon">📝</div><div class="feat-text">Sabab yozib qoldiring</div></div>' +
-    '<div class="feat"><div class="feat-icon">🔄</div><div class="feat-text">Bepul qayta tozalash</div></div>' +
-    '<button class="btn btn-primary" style="margin-top:12px" onclick="sendData({action:\'warranty\'});closeM();toast(\'✅ Kafolat talabi yuborildi!\')">🛡 Kafolat talabi</button>' +
-    '<button class="btn btn-ghost" onclick="closeM()">Yopish</button>'
+    '<div class="m-t">🛡 Kafolat</div>' +
+    '<div class="cd" style="background:var(--ok-bg);border:1.5px solid var(--ok-bg2);text-align:center">' +
+    '<div style="font-size:34px;margin-bottom:6px">🛡</div>' +
+    '<div style="font-size:16px;font-weight:700">48 SOAT KAFOLAT</div>' +
+    '<div style="font-size:12px;color:var(--t2);margin-top:3px">Norozi = bepul qayta tozalash!</div></div>' +
+    '<div class="ft"><div class="ft-i">✅</div><div class="ft-t">48 soat ichida murojaat</div></div>' +
+    '<div class="ft"><div class="ft-i">📸</div><div class="ft-t">Muammo rasmini yuboring</div></div>' +
+    '<div class="ft"><div class="ft-i">📝</div><div class="ft-t">Sabab yozing</div></div>' +
+    '<div class="ft"><div class="ft-i">🔄</div><div class="ft-t">Bepul qayta tozalash</div></div>' +
+    '<button class="btn btn-p" style="margin-top:12px" onclick="sendD({action:\'warranty\'});closeM();toast(\'✅ Yuborildi!\');haptic(\'success\')">🛡 Kafolat talabi</button>' +
+    '<button class="btn btn-gh" onclick="closeM()">Yopish</button>'
   );
 }
 
 function openGift() {
   var amounts = [500000, 1000000, 2000000, 5000000];
-  var svcHtml = '';
+  var sg = '';
   for (var i = 0; i < amounts.length; i++) {
     var a = amounts[i];
-    svcHtml += '<div class="svc" onclick="sendData({action:\'gift\',amount:' + a + '});closeM();toast(\'✅ ' + F(a) + ' sertifikat!\')">';
-    svcHtml += '<span class="svc-emoji">🎁</span><div class="svc-name">' + F(a) + '</div><div class="svc-price">so\'m</div></div>';
+    sg += '<div class="sv" onclick="sendD({action:\'gift\',amount:' + a + '});closeM();toast(\'✅ ' + F(a) + ' sertifikat!\');haptic(\'success\')">';
+    sg += '<span class="sv-e">🎁</span><div class="sv-n">' + F(a) + '</div><div class="sv-p">so\'m</div></div>';
   }
-
   openM(
-    '<div class="modal-title">🎁 Sovg\'a sertifikat</div>' +
-    '<p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">Do\'stingizga tozalash xizmati sovg\'a qiling!</p>' +
-    '<div class="svc-grid">' + svcHtml + '</div>' +
-    '<div class="field" style="margin-top:10px"><label class="label">🎟 Kodni ishlatish</label>' +
-    '<div style="display:flex;gap:6px"><input class="input" id="giftCodeInput" placeholder="GIFT****" style="text-transform:uppercase">' +
-    '<button class="btn btn-primary" style="width:auto;padding:12px 16px" ' +
-    'onclick="var c=$(\'giftCodeInput\');if(c)sendData({action:\'gift_use\',code:c.value});closeM();toast(\'✅ Tekshirilmoqda...\')">✅</button></div></div>' +
-    '<button class="btn btn-ghost" onclick="closeM()">Yopish</button>'
+    '<div class="m-t">🎁 Sovg\'a</div>' +
+    '<p style="font-size:12px;color:var(--t2);margin-bottom:12px">Do\'stingizga sovg\'a qiling!</p>' +
+    '<div class="sg">' + sg + '</div>' +
+    '<div class="fg" style="margin-top:10px"><label class="fl">🎟 Kodni ishlatish</label>' +
+    '<div style="display:flex;gap:6px"><input class="fi" id="gC" placeholder="GIFT****" style="text-transform:uppercase">' +
+    '<button class="btn btn-p" style="width:auto;padding:13px 18px" onclick="var c=$(\'gC\');if(c&&c.value)sendD({action:\'gift_use\',code:c.value});closeM();toast(\'✅ Tekshirilmoqda...\')">✅</button></div></div>' +
+    '<button class="btn btn-gh" onclick="closeM()">Yopish</button>'
   );
 }
 
 function openPromos() {
   var discs = [
-    {e:'🎉', t:'Birinchi', v:'-5%', d:'1-buyurtma'},
-    {e:'🏆', t:'Sodiq', v:'-10%', d:'10+ buyurtma'},
-    {e:'🌟', t:'VIP', v:'-8%', d:'20+ buyurtma'},
-    {e:'👥', t:'Referral', v:'-5%', d:"Do'st taklif"},
-    {e:'📦', t:'Paket', v:'-10%', d:'2+ xizmat'},
-    {e:'💎', t:'Premium', v:'-20%', d:"A'zolik"},
+    {e:'🎉',t:'Birinchi',v:'-5%',d:'1-buyurtma'},{e:'🏆',t:'Sodiq',v:'-10%',d:'10+'},
+    {e:'🌟',t:'VIP',v:'-8%',d:'20+'},{e:'👥',t:'Referral',v:'-5%',d:"Do'st"},
+    {e:'📦',t:'Paket',v:'-10%',d:'2+ xizmat'},{e:'💎',t:'Premium',v:'-20%',d:"A'zolik"}
   ];
-
-  var discHtml = '';
+  var dh = '';
   for (var i = 0; i < discs.length; i++) {
     var x = discs[i];
-    discHtml += '<div class="disc"><span class="disc-emoji">' + x.e + '</span>';
-    discHtml += '<div class="disc-label">' + x.t + '</div>';
-    discHtml += '<div class="disc-value">' + x.v + '</div>';
-    discHtml += '<div class="disc-desc">' + x.d + '</div></div>';
+    dh += '<div class="di"><span class="di-e">' + x.e + '</span><div class="di-l">' + x.t + '</div><div class="di-v">' + x.v + '</div><div class="di-d">' + x.d + '</div></div>';
   }
-
   openM(
-    '<div class="modal-title">🎄 Aksiyalar</div>' +
-    '<div class="disc-grid" style="margin-bottom:12px">' + discHtml + '</div>' +
-    '<div class="card-title">🎟 Promo kod</div>' +
-    '<div style="display:flex;gap:6px;margin-bottom:6px">' +
-    '<input class="input" id="promoInput" placeholder="PROMO kod...">' +
-    '<button class="btn btn-primary" style="width:auto;padding:12px 16px" ' +
-    'onclick="var p=$(\'promoInput\');if(p&&p.value)sendData({action:\'promo\',code:p.value});toast(\'✅ Tekshirilmoqda...\')">✅</button></div>' +
-    '<button class="btn btn-ghost" onclick="closeM()">Yopish</button>'
+    '<div class="m-t">🎄 Aksiyalar</div><div class="dg" style="margin-bottom:12px">' + dh + '</div>' +
+    '<div class="cd-t">🎟 Promo kod</div>' +
+    '<div class="prm"><input class="fi" id="pC" placeholder="KOD...">' +
+    '<button class="btn btn-p" onclick="var p=$(\'pC\');if(p&&p.value)sendD({action:\'promo\',code:p.value});toast(\'✅\')">✅</button></div>' +
+    '<button class="btn btn-gh" onclick="closeM()" style="margin-top:6px">Yopish</button>'
   );
 }
 
 function openPartner() {
   openM(
-    '<div class="modal-title">🤝 Hamkorlik dasturi</div>' +
-    '<div class="card" style="background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;text-align:center;border:none">' +
-    '<div style="font-size:28px;font-weight:800">10%</div>' +
-    '<div style="font-size:13px;font-weight:600">Har buyurtmadan komissiya!</div></div>' +
-    '<div class="feat"><div class="feat-icon">1️⃣</div><div class="feat-text">Ariza bering</div></div>' +
-    '<div class="feat"><div class="feat-icon">2️⃣</div><div class="feat-text">Shaxsiy link oling</div></div>' +
-    '<div class="feat"><div class="feat-icon">3️⃣</div><div class="feat-text">Mijozlarni yo\'naltiring</div></div>' +
-    '<div class="feat"><div class="feat-icon">4️⃣</div><div class="feat-text">10% komissiya oling</div></div>' +
-    '<div class="field" style="margin-top:12px"><label class="label">🏢 Biznes turi</label>' +
-    '<input class="input" id="partBizInput" placeholder="Mebel do\'koni, remont..."></div>' +
-    '<div class="field"><label class="label">📱 Telefon</label>' +
-    '<input class="input" type="tel" id="partPhoneInput" placeholder="+998..."></div>' +
-    '<button class="btn btn-success" onclick="submitPartner()">📤 Ariza berish</button>'
+    '<div class="m-t">🤝 Hamkorlik</div>' +
+    '<div class="cd" style="background:var(--p-g);color:#fff;text-align:center;border:none;box-shadow:0 8px 32px rgba(108,92,231,.25)">' +
+    '<div style="font-size:30px;font-weight:800">10%</div>' +
+    '<div style="font-size:14px;font-weight:600">Har buyurtmadan komissiya!</div></div>' +
+    '<div class="ft"><div class="ft-i">1️⃣</div><div class="ft-t">Ariza bering</div></div>' +
+    '<div class="ft"><div class="ft-i">2️⃣</div><div class="ft-t">Shaxsiy link oling</div></div>' +
+    '<div class="ft"><div class="ft-i">3️⃣</div><div class="ft-t">Mijozlarni yo\'naltiring</div></div>' +
+    '<div class="ft"><div class="ft-i">4️⃣</div><div class="ft-t">10% komissiya oling</div></div>' +
+    '<div class="fg" style="margin-top:12px"><label class="fl">🏢 Biznes</label><input class="fi" id="pB" placeholder="Mebel, remont..."></div>' +
+    '<div class="fg"><label class="fl">📱 Telefon</label><input class="fi" type="tel" id="pP" placeholder="+998..."></div>' +
+    '<button class="btn btn-ok" onclick="var b=$(\'pB\'),p=$(\'pP\');if(!b||!b.value||!p||!p.value){toast(\'❌ Kiriting\');return}sendD({action:\'partner\',business:b.value,phone:p.value});closeM();toast(\'✅ Yuborildi!\');haptic(\'success\')">📤 Ariza</button>'
   );
-}
-
-function submitPartner() {
-  var biz = $('partBizInput');
-  var ph = $('partPhoneInput');
-  if (!biz || !biz.value || !ph || !ph.value) {
-    toast("❌ Ma'lumotlarni kiriting");
-    return;
-  }
-  sendData({action: 'partner', business: biz.value, phone: ph.value});
-  closeM();
-  toast('✅ Ariza yuborildi!');
 }
 
 function openMember() {
   var plans = [
-    {n:'Basic', p:200000, d:10, perks:['Har buyurtmada -10%', 'Ustuvor xizmat'], rec:false},
-    {n:'Premium', p:500000, d:20, perks:['Har buyurtmada -20%', 'Ustuvor xizmat', 'Bepul konsultatsiya', 'VIP support'], rec:true},
+    {n:'Basic',p:200000,d:10,pk:['Har buyurtma -10%','Ustuvor xizmat'],r:false},
+    {n:'Premium',p:500000,d:20,pk:['Har buyurtma -20%','Ustuvor xizmat','Bepul konsultatsiya','VIP support'],r:true}
   ];
-
-  var html = '<div class="modal-title">💎 A\'zolik rejalari</div>';
-
+  var h = '<div class="m-t">💎 A\'zolik</div>';
   for (var i = 0; i < plans.length; i++) {
     var m = plans[i];
-    var borderStyle = m.rec ? '2px solid var(--primary)' : '1.5px solid var(--border-primary)';
-    var btnClass = m.rec ? 'btn-primary' : 'btn-outline';
-    var icon = m.rec ? '💎' : '🥈';
-
-    html += '<div class="card" style="border:' + borderStyle + '">';
-    if (m.rec) html += '<span class="badge badge-blue" style="margin-bottom:6px">⭐ TAVSIYA</span>';
-    html += '<div class="card-title">' + icon + ' ' + m.n + '</div>';
-    html += '<div style="font-size:22px;font-weight:800;color:var(--primary);margin-bottom:6px">' + F(m.p) + ' <span style="font-size:11px;color:var(--text-tertiary)">so\'m/oy</span></div>';
-    html += '<div style="font-size:18px;font-weight:800;color:var(--success);margin-bottom:8px">-' + m.d + '%</div>';
-
-    for (var j = 0; j < m.perks.length; j++) {
-      html += '<div class="feat" style="padding:4px 0"><div class="feat-icon">✅</div><div class="feat-text">' + m.perks[j] + '</div></div>';
+    var brd = m.r ? '2px solid var(--p)' : '2px solid var(--b)';
+    var bc = m.r ? 'btn-p' : 'btn-o';
+    var icon = m.r ? '💎' : '🥈';
+    h += '<div class="cd" style="border:' + brd + '">';
+    if (m.r) h += '<span class="bdg bdg-p" style="margin-bottom:6px">⭐ TAVSIYA</span>';
+    h += '<div class="cd-t">' + icon + ' ' + m.n + '</div>';
+    h += '<div style="font-size:22px;font-weight:800;background:var(--p-g);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px">' + F(m.p) + ' <span style="font-size:11px;color:var(--t3);-webkit-text-fill-color:var(--t3)">so\'m/oy</span></div>';
+    h += '<div style="font-size:18px;font-weight:800;background:linear-gradient(135deg,var(--ok),var(--s));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">-' + m.d + '%</div>';
+    for (var j = 0; j < m.pk.length; j++) {
+      h += '<div class="ft" style="padding:4px 0"><div class="ft-i">✅</div><div class="ft-t">' + m.pk[j] + '</div></div>';
     }
-
-    html += '<button class="btn ' + btnClass + '" style="margin-top:10px" ' +
-      'onclick="sendData({action:\'membership\',plan:\'' + m.n.toLowerCase() + '\',price:' + m.p + '});closeM();toast(\'✅ Yuborildi!\')">' +
-      icon + ' ' + m.n + ' — ' + F(m.p) + ' so\'m</button></div>';
+    h += '<button class="btn ' + bc + '" style="margin-top:10px" onclick="sendD({action:\'membership\',plan:\'' + m.n.toLowerCase() + '\',price:' + m.p + '});closeM();toast(\'✅ Yuborildi!\');haptic(\'success\')">' + icon + ' ' + m.n + ' — ' + F(m.p) + '</button></div>';
   }
-
-  html += '<button class="btn btn-ghost" onclick="closeM()">Yopish</button>';
-  openM(html);
+  h += '<button class="btn btn-gh" onclick="closeM()">Yopish</button>';
+  openM(h);
 }
 
 function openCompare() {
   openM(
-    '<div class="modal-title">📊 Narx taqqoslash</div>' +
-    '<div style="overflow-x:auto;margin-bottom:12px">' +
-    '<table class="cmp-table">' +
-    '<tr><th></th><th style="color:var(--primary)">🏆 Biz</th><th>Komp. A</th><th>Komp. B</th></tr>' +
+    '<div class="m-t">📊 Taqqoslash</div>' +
+    '<div style="overflow-x:auto;margin-bottom:12px"><table class="cmp">' +
+    '<tr><th></th><th style="color:var(--p)">🏆 Biz</th><th>A</th><th>B</th></tr>' +
     '<tr><td>Tozalash</td><td class="cmp-us">500K</td><td>600K</td><td>550K</td></tr>' +
     '<tr><td>Divan</td><td class="cmp-us">80K</td><td>100K</td><td>90K</td></tr>' +
     '<tr><td>Gilam</td><td class="cmp-us">27K</td><td>35K</td><td>30K</td></tr>' +
-    '<tr><td>Fasad</td><td class="cmp-us">22K</td><td>28K</td><td>25K</td></tr>' +
     '<tr><td>Borish</td><td class="cmp-hl">Bepul</td><td>+20K</td><td>+15K</td></tr>' +
-    '<tr><td>Kafolat</td><td class="cmp-hl">48 soat</td><td>Yo\'q</td><td>24 soat</td></tr>' +
-    '</table></div>' +
-    '<button class="btn btn-primary" onclick="closeM();go(\'order\');newOrder(false)">📝 Buyurtma berish</button>' +
-    '<button class="btn btn-ghost" onclick="closeM()">Yopish</button>'
+    '<tr><td>Kafolat</td><td class="cmp-hl">48s</td><td>Yo\'q</td><td>24s</td></tr></table></div>' +
+    '<button class="btn btn-p" onclick="closeM();go(\'order\');newOrd(false)">✨ Buyurtma</button>' +
+    '<button class="btn btn-gh" onclick="closeM()">Yopish</button>'
   );
 }
 
 function openHome() {
-  var h = savedHome;
+  var hm = savedHome;
   openM(
-    '<div class="modal-title">🏠 Uy profili</div>' +
-    '<p style="font-size:11px;color:var(--text-tertiary);margin-bottom:10px">Saqlang — keyingi buyurtmalarda tezroq!</p>' +
-    '<div class="field"><label class="label">🚪 Xonalar soni</label>' +
-    '<input class="input" id="homeRooms" value="' + (h.rooms || '') + '" placeholder="3"></div>' +
-    '<div class="field"><label class="label">📐 Maydon (kv.m)</label>' +
-    '<input class="input" id="homeArea" value="' + (h.area || '') + '" placeholder="80"></div>' +
-    '<div class="field"><label class="label">🏢 Qavat</label>' +
-    '<input class="input" id="homeFloor" value="' + (h.floor || '') + '" placeholder="5"></div>' +
-    '<div class="field"><label class="label">📍 Manzil</label>' +
-    '<input class="input" id="homeAddr" value="' + (h.addr || '') + '" placeholder="Ko\'cha, uy..."></div>' +
-    '<div class="field"><label class="label">🔑 Eslatma</label>' +
-    '<textarea class="input" id="homeNotes" placeholder="Eshik kodi, lift...">' + (h.notes || '') + '</textarea></div>' +
-    '<button class="btn btn-success" onclick="saveHomeProfile()">💾 Saqlash</button>'
+    '<div class="m-t">🏠 Uy profili</div>' +
+    '<p style="font-size:11px;color:var(--t3);margin-bottom:10px">Saqlang — tezroq buyurtma!</p>' +
+    '<div class="fg"><label class="fl">🚪 Xonalar</label><input class="fi" id="hR" value="' + (hm.rooms || '') + '" placeholder="3"></div>' +
+    '<div class="fg"><label class="fl">📐 Maydon</label><input class="fi" id="hA" value="' + (hm.area || '') + '" placeholder="80 kv.m"></div>' +
+    '<div class="fg"><label class="fl">🏢 Qavat</label><input class="fi" id="hF" value="' + (hm.floor || '') + '" placeholder="5"></div>' +
+    '<div class="fg"><label class="fl">📍 Manzil</label><input class="fi" id="hAd" value="' + (hm.addr || '') + '" placeholder="Ko\'cha, uy..."></div>' +
+    '<div class="fg"><label class="fl">🔑 Eslatma</label><textarea class="fi" id="hN" placeholder="Eshik kodi...">' + (hm.notes || '') + '</textarea></div>' +
+    '<button class="btn btn-ok" onclick="saveHm()">💾 Saqlash</button>'
   );
 }
 
-function saveHomeProfile() {
+function saveHm() {
   savedHome = {
-    rooms: $('homeRooms') ? $('homeRooms').value : '',
-    area: $('homeArea') ? $('homeArea').value : '',
-    floor: $('homeFloor') ? $('homeFloor').value : '',
-    addr: $('homeAddr') ? $('homeAddr').value : '',
-    notes: $('homeNotes') ? $('homeNotes').value : ''
+    rooms: $('hR') ? $('hR').value : '',
+    area: $('hA') ? $('hA').value : '',
+    floor: $('hF') ? $('hF').value : '',
+    addr: $('hAd') ? $('hAd').value : '',
+    notes: $('hN') ? $('hN').value : ''
   };
-  sendData({action: 'home_profile', rooms: savedHome.rooms, area: savedHome.area, floor: savedHome.floor, addr: savedHome.addr, notes: savedHome.notes});
-  closeM();
-  toast('✅ Uy profili saqlandi!');
+  sendD({action:'home_profile', rooms:savedHome.rooms, area:savedHome.area, floor:savedHome.floor, addr:savedHome.addr, notes:savedHome.notes});
+  closeM(); toast('✅ Saqlandi!'); haptic('success');
 }
 
 function openPrivacy() {
   openM(
-    '<div class="modal-title">🔐 Maxfiylik siyosati</div>' +
-    '<div class="feat"><div class="feat-icon">✅</div><div class="feat-text">Telefon — faqat aloqa uchun</div></div>' +
-    '<div class="feat"><div class="feat-icon">✅</div><div class="feat-text">Manzil — faqat xizmat uchun</div></div>' +
-    '<div class="feat"><div class="feat-icon">✅</div><div class="feat-text">Rasmlar — narx aniqlash uchun</div></div>' +
-    '<div class="feat"><div class="feat-icon">❌</div><div class="feat-text">Uchinchi shaxslarga berilmaydi</div></div>' +
-    '<div class="feat"><div class="feat-icon">❌</div><div class="feat-text">Reklama uchun ishlatilmaydi</div></div>' +
-    '<button class="btn btn-danger" style="margin-top:12px" onclick="confirmDeleteData()">🗑 Ma\'lumotlarni o\'chirish</button>' +
-    '<button class="btn btn-ghost" onclick="closeM()">Yopish</button>'
+    '<div class="m-t">🔐 Maxfiylik</div>' +
+    '<div class="ft"><div class="ft-i">✅</div><div class="ft-t">Telefon — faqat aloqa</div></div>' +
+    '<div class="ft"><div class="ft-i">✅</div><div class="ft-t">Manzil — faqat xizmat</div></div>' +
+    '<div class="ft"><div class="ft-i">❌</div><div class="ft-t">3-shaxslarga berilmaydi</div></div>' +
+    '<div class="ft"><div class="ft-i">❌</div><div class="ft-t">Reklama uchun ishlatilmaydi</div></div>' +
+    '<button class="btn btn-er" style="margin-top:12px" onclick="confirmDel()">🗑 O\'chirish</button>' +
+    '<button class="btn btn-gh" onclick="closeM()">Yopish</button>'
   );
 }
 
-function confirmDeleteData() {
+function confirmDel() {
   openM(
     '<div style="text-align:center;padding:20px 0">' +
-    '<div style="font-size:44px;margin-bottom:12px">⚠️</div>' +
-    '<div style="font-size:15px;font-weight:700;margin-bottom:8px">Ishonchingiz komilmi?</div>' +
-    '<p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px">Barcha ma\'lumotlaringiz o\'chiriladi va bu amalni qaytarib bo\'lmaydi.</p>' +
-    '<button class="btn btn-danger" onclick="sendData({action:\'delete_data\'});closeM();toast(\'✅ So\\\'rov yuborildi\')">Ha, o\'chirish</button>' +
-    '<button class="btn btn-ghost" onclick="closeM()" style="margin-top:6px">Bekor qilish</button></div>'
+    '<div style="font-size:48px;margin-bottom:12px">⚠️</div>' +
+    '<div style="font-size:16px;font-weight:700;margin-bottom:8px">Ishonchingiz komilmi?</div>' +
+    '<p style="font-size:12px;color:var(--t2);margin-bottom:16px">Barcha ma\'lumotlar o\'chiriladi</p>' +
+    '<button class="btn btn-er" onclick="sendD({action:\'delete_data\'});closeM();toast(\'✅ Yuborildi\');haptic(\'success\')">Ha, o\'chirish</button>' +
+    '<button class="btn btn-gh" onclick="closeM()" style="margin-top:6px">Bekor</button></div>'
   );
 }
 
 function openSettings() {
   var isDark = document.body.classList.contains('dark');
   openM(
-    '<div class="modal-title">⚙️ Sozlamalar</div>' +
-    '<div class="sw-row">' +
-    '<div class="sw-body"><div class="sw-name">🌙 Dark rejim</div><div class="sw-desc">Qorang\'i interfeys</div></div>' +
-    '<div class="sw-toggle' + (isDark ? ' on' : '') + '" onclick="toggleTheme();this.classList.toggle(\'on\')"></div></div>' +
-    '<div class="sw-row">' +
-    '<div class="sw-body"><div class="sw-name">🔔 Bildirishnomalar</div><div class="sw-desc">Eslatmalar olish</div></div>' +
-    '<div class="sw-toggle on" onclick="this.classList.toggle(\'on\')"></div></div>' +
-    '<div class="sw-row">' +
-    '<div class="sw-body"><div class="sw-name">🌐 Til</div><div class="sw-desc">O\'zbek tili</div></div>' +
+    '<div class="m-t">⚙️ Sozlamalar</div>' +
+    '<div class="sw"><div class="sw-b"><div class="sw-n">🌙 Dark rejim</div><div class="sw-d">Qorang\'i mavzu</div></div>' +
+    '<div class="sw-t' + (isDark ? ' on' : '') + '" onclick="toggleTheme();this.classList.toggle(\'on\')"></div></div>' +
+    '<div class="sw"><div class="sw-b"><div class="sw-n">🔔 Bildirishnomalar</div><div class="sw-d">Eslatmalar</div></div>' +
+    '<div class="sw-t on" onclick="this.classList.toggle(\'on\')"></div></div>' +
+    '<div class="sw"><div class="sw-b"><div class="sw-n">🌐 Til</div><div class="sw-d">O\'zbek</div></div>' +
     '<div style="font-size:16px">🇺🇿</div></div>' +
-    '<button class="btn btn-primary" style="margin-top:12px" onclick="closeM();toast(\'✅ Saqlandi\')">Saqlash</button>'
+    '<button class="btn btn-p" style="margin-top:12px" onclick="closeM();toast(\'✅ Saqlandi\');haptic(\'success\')">Saqlash</button>'
   );
 }
 
 function toggleTheme() {
   document.body.classList.toggle('dark');
   var btn = $('themeBtn');
-  if (btn) {
-    btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
-  }
+  if (btn) btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+  haptic('light');
 }
 
 // ═══════════════════════════════════════
-//  INIT
+//  BOOT
 // ═══════════════════════════════════════
 function boot() {
   drawHome();
@@ -1239,28 +904,18 @@ function boot() {
   drawTips();
   go('home');
 
-  // Modal close
   var mBg = $('mBg');
-  if (mBg) {
-    mBg.addEventListener('click', function(e) {
-      if (e.target === mBg) closeM();
-    });
-  }
+  if (mBg) mBg.addEventListener('click', function(e) { if (e.target === mBg) closeM(); });
 
-  // Telegram MainButton
   try {
-    tg.MainButton.setText('📝 Buyurtma berish');
+    tg.MainButton.setText('✨ Buyurtma berish');
+    tg.MainButton.color = '#6C5CE7';
+    tg.MainButton.textColor = '#FFFFFF';
     tg.MainButton.show();
-    tg.MainButton.onClick(function() {
-      go('order');
-      newOrder(false);
-    });
-  } catch(e) {
-    // MainButton qo'llab-quvvatlanmasa
-  }
+    tg.MainButton.onClick(function() { go('order'); newOrd(false); });
+  } catch(e) {}
 }
 
-// DOM tayyor bo'lganda ishga tushirish
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', boot);
 } else {
